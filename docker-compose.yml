@@ -1,0 +1,21 @@
+services:
+  postgres:
+    container_name: pointroulette-postgresql
+    environment:
+      POSTGRES_USER: pointroulette
+      POSTGRES_PASSWORD: pointroulette
+      POSTGRES_DB: pointroulette
+    image: postgres:16
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U pointroulette -d pointroulette" ]
+      interval: 30s
+      timeout: 1s
+      retries: 5
+
+volumes:
+  pg-data:
+    driver: local
