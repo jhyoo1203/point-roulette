@@ -1,0 +1,39 @@
+name: General
+description: 일반 이슈 (문서, 설정 등)
+title: "[General] "
+labels: ["general"]
+body:
+  - type: dropdown
+    id: type
+    attributes:
+      label: 타입
+      options:
+        - Documentation
+        - Configuration
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: 카테고리
+      options:
+        - 문서화
+        - 설정
+        - CI/CD
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 설명
+      placeholder: 무엇을 구현/수정하나요?
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: 완료 조건
+      placeholder: |
+        - [ ]
+        - [ ]
