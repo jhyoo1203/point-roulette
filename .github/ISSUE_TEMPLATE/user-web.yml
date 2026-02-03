@@ -1,0 +1,43 @@
+name: User Web
+description: 사용자 웹 관련 이슈
+title: "[Web] "
+labels: ["user-web", "frontend"]
+body:
+  - type: dropdown
+    id: type
+    attributes:
+      label: 타입
+      options:
+        - Feature
+        - Bug
+        - UI/UX
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: 카테고리
+      options:
+        - 로그인
+        - 룰렛
+        - 포인트 관리
+        - 상품 목록
+        - 주문 내역
+        - 기타
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 설명
+      placeholder: 무엇을 구현/수정하나요?
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: 완료 조건
+      placeholder: |
+        - [ ]
+        - [ ]

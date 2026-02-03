@@ -1,0 +1,39 @@
+name: Flutter App
+description: Flutter 앱 관련 이슈
+title: "[Flutter] "
+labels: ["flutter", "mobile"]
+body:
+  - type: dropdown
+    id: type
+    attributes:
+      label: 타입
+      options:
+        - Feature
+        - Bug
+        - Build/Deploy
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: platform
+    attributes:
+      label: 플랫폼
+      options:
+        - label: Android
+        - label: iOS
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 설명
+      placeholder: 무엇을 구현/수정하나요?
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: 완료 조건
+      placeholder: |
+        - [ ]
+        - [ ]

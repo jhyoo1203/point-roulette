@@ -1,0 +1,44 @@
+name: Backend
+description: 백엔드 관련 이슈
+title: "[Backend] "
+labels: ["backend"]
+body:
+  - type: dropdown
+    id: type
+    attributes:
+      label: 타입
+      options:
+        - Feature
+        - Bug
+        - Refactor
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: 카테고리
+      options:
+        - 인증/로그인
+        - 룰렛 기능
+        - 포인트 관리
+        - 상품 관리
+        - 주문 관리
+        - 어드민 API
+        - 기타
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 설명
+      placeholder: 무엇을 구현/수정하나요?
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: 완료 조건
+      placeholder: |
+        - [ ]
+        - [ ]
