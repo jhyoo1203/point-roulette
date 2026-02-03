@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: pointroulette
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${POSTGRESQL_URL:jdbc:postgresql://localhost:5433/pointroulette}
+    username: ${POSTGRESQL_USERNAME:pointroulette}
+    password: ${POSTGRESQL_PASSWORD:pointroulette}
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
