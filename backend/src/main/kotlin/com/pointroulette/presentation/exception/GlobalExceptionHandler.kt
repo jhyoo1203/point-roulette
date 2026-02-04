@@ -25,10 +25,23 @@ class GlobalExceptionHandler {
     fun handleBusinessException(
         ex: BusinessException
     ): ResponseEntity<ResponseData<Nothing>> {
-        val response = ResponseData.error<Nothing>(ErrorCode.BUSINESS_ERROR)
+        val response = ResponseData.error<Nothing>(ex.errorCode)
         val caller = getCallerInfo(ex)
-        log.warn("$caller - Business exception: ${ex.message}")
-        return ResponseEntity.status(ErrorCode.BUSINESS_ERROR.httpStatus).body(response)
+        log.warn("$caller - Business exception: ${ex.errorCode.message}")
+        return ResponseEntity.status(ex.errorCode.httpStatus).body(response)
+    }
+
+    /**
+     * ResourceNotFoundException 처리
+     */
+    @ExceptionHandler(ResourceNotFoundException::class)
+    fun handleResourceNotFoundException(
+        ex: ResourceNotFoundException
+    ): ResponseEntity<ResponseData<Nothing>> {
+        val response = ResponseData.error<Nothing>(ErrorCode.RESOURCE_NOT_FOUND)
+        val caller = getCallerInfo(ex)
+        log.warn("$caller - Resource not found: ${ex.message}")
+        return ResponseEntity.status(ErrorCode.RESOURCE_NOT_FOUND.httpStatus).body(response)
     }
 
     /**
