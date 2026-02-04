@@ -44,4 +44,12 @@ class SwaggerConfig(
             .pathsToMatch("/api/v1/users/**")
             .build()
     }
+
+    @Bean
+    fun adminProductApi(): GroupedOpenApi {
+        return GroupedOpenApi.builder()
+            .group("admin-product-api")
+            .pathsToMatch("/api/v1/admin/products/**")
+            .build()
+    }
 }
