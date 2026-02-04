@@ -52,4 +52,12 @@ class SwaggerConfig(
             .pathsToMatch("/api/v1/admin/products/**")
             .build()
     }
+
+    @Bean
+    fun adminBudgetApi(): GroupedOpenApi {
+        return GroupedOpenApi.builder()
+            .group("admin-budget-api")
+            .pathsToMatch("/api/v1/admin/budgets/**")
+            .build()
+    }
 }

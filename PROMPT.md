@@ -176,6 +176,37 @@ obsidian에서 ERD 확인해서 postgreSQL 기반 DDL을 생성해줘.
 
 ---
 
+### [설계] + [문제 고민과 해결] admin 일일 예산 로직 구현 전 설계에 대한 고민 및 해결
+
+**프롬프트**
+```
+admin 일일 예산 조회/설정 로직을 구현한다.
+- 날짜 범위로 일일 예산 등록(100,000p) 고정
+- bulk insert(e.g. 1년치를 한꺼번에 insert 한다면 db latency 부담 우려)
+- 일일 예산 조회 admin api 구현(날짜 범위로 검색)
+
+obsidian에서 "2026 상반기 유저서비스스쿼드 과제.md" 문서 확인해서 현재 구현 계획 어떨지 리뷰해줘.
+
+[대화 진행]
+Q: IDENTITY 전략의 batch insert 미동작할 것으로 예상하는데 SEQUENCE 전략으로 변경 필요하지 않아?
+A: [IDENTITY 전략의 batch insert 미동작 문제 지적]
+   - GenerationType.IDENTITY는 batch insert가 동작하지 않음
+   - SEQUENCE 전략으로 변경 필요
+   - allocationSize 설정으로 시퀀스 캐싱 최적화
+
+Q: 모든 엔티티를 sequence 방식으로 변경할지, 예산만 sequence 방식으로 적용할지 검토해줘.
+A: [2가지 전략 비교 및 엔티티별 분석]
+   전략 1: DailyBudget만 SEQUENCE (최소 변경)
+   전략 2: 모든 엔티티 SEQUENCE (완전 통일)
+```
+
+**설명**
+- 설계한 구조대로 진행
+- 상단에서 서술한 sequence 전략은 2번 방식 선택
+- 구현 전 고민되던 부분들 질문 및 해결
+
+---
+
 ## 2. NotebookLM
 _(이후 추가 예정)_
 

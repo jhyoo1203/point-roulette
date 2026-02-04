@@ -7,6 +7,7 @@ import java.time.LocalDate
 /**
  * 일일 예산 엔티티
  * - 낙관적 락(version)을 통한 동시성 제어
+ * - SEQUENCE 전략: 건수가 많을 때(e.g. 1년치 365건) 최적화
  */
 @Entity
 @Table(
@@ -27,7 +28,12 @@ class DailyBudget(
 ) : BaseEntity() {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "daily_budgets_id_seq")
+    @SequenceGenerator(
+        name = "daily_budgets_id_seq",
+        sequenceName = "daily_budgets_id_seq",
+        allocationSize = 50
+    )
     val id: Long = 0
 
     @Version

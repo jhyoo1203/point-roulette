@@ -41,8 +41,8 @@ interface AdminProductControllerDocs {
                             "stock": 100,
                             "description": "10,000 포인트 상품",
                             "status": "ACTIVE",
-                            "createdAt": "2024-01-01T00:00:00",
-                            "updatedAt": "2024-01-01T00:00:00"
+                            "createdAt": "2026-01-01T00:00:00",
+                            "updatedAt": "2026-01-01T00:00:00"
                           }
                         }"""
                     )]
@@ -92,8 +92,8 @@ interface AdminProductControllerDocs {
                             "stock": 100,
                             "description": "10,000 포인트 상품",
                             "status": "ACTIVE",
-                            "createdAt": "2024-01-01T00:00:00",
-                            "updatedAt": "2024-01-01T00:00:00"
+                            "createdAt": "2026-01-01T00:00:00",
+                            "updatedAt": "2026-01-01T00:00:00"
                           }
                         }"""
                     )]
@@ -144,8 +144,8 @@ interface AdminProductControllerDocs {
                                 "stock": 100,
                                 "description": "10,000 포인트 상품",
                                 "status": "ACTIVE",
-                                "createdAt": "2024-01-01T00:00:00",
-                                "updatedAt": "2024-01-01T00:00:00"
+                                "createdAt": "2026-01-01T00:00:00",
+                                "updatedAt": "2026-01-01T00:00:00"
                               }
                             ],
                             "page": 0,
@@ -186,8 +186,8 @@ interface AdminProductControllerDocs {
                             "stock": 100,
                             "description": "10,000 포인트 상품",
                             "status": "ACTIVE",
-                            "createdAt": "2024-01-01T00:00:00",
-                            "updatedAt": "2024-01-01T01:00:00"
+                            "createdAt": "2026-01-01T00:00:00",
+                            "updatedAt": "2026-01-01T01:00:00"
                           }
                         }"""
                     )]
