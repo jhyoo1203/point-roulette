@@ -1,12 +1,11 @@
 package com.pointroulette.application.product.dto
 
+import com.pointroulette.common.model.PaginationRequest
 import com.pointroulette.domain.product.ProductStatus
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
 
 /**
  * 상품 검색 요청 파라미터
@@ -38,17 +37,8 @@ data class ProductSearchRequest(
 ) {
     /**
      * Spring Data Pageable 객체로 변환
-     * sort 문자열을 파싱하여 Sort.Direction과 필드명으로 분리
      */
     fun toPageable(): Pageable {
-        val sortParts = sort.split(",")
-        val property = sortParts.getOrNull(0) ?: "updatedAt"
-        val direction = when (sortParts.getOrNull(1)?.uppercase()) {
-            "ASC" -> Sort.Direction.ASC
-            "DESC" -> Sort.Direction.DESC
-            else -> Sort.Direction.DESC
-        }
-
-        return PageRequest.of(page, size, Sort.by(direction, property))
+        return PaginationRequest.toPageable(page, size, sort, "updatedAt")
     }
 }

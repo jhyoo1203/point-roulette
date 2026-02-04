@@ -1,12 +1,11 @@
 package com.pointroulette.application.budget.dto
 
+import com.pointroulette.common.model.PaginationRequest
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotNull
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
 import java.time.LocalDate
 
 /**
@@ -40,17 +39,8 @@ data class DailyBudgetSearchRequest(
 ) {
     /**
      * Spring Data Pageable 객체로 변환
-     * sort 문자열을 파싱하여 Sort.Direction과 필드명으로 분리
      */
     fun toPageable(): Pageable {
-        val sortParts = sort.split(",")
-        val property = sortParts.getOrNull(0) ?: "budgetDate"
-        val direction = when (sortParts.getOrNull(1)?.uppercase()) {
-            "ASC" -> Sort.Direction.ASC
-            "DESC" -> Sort.Direction.DESC
-            else -> Sort.Direction.DESC
-        }
-
-        return PageRequest.of(page, size, Sort.by(direction, property))
+        return PaginationRequest.toPageable(page, size, sort, "budgetDate")
     }
 }
