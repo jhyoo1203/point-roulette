@@ -7,28 +7,28 @@ import java.time.LocalDateTime
 
 @Schema(description = "상품 응답")
 data class ProductResponse(
-    @Schema(description = "상품 ID", example = "1")
+    @field:Schema(description = "상품 ID", example = "1")
     val id: Long,
 
-    @Schema(description = "상품명", example = "포인트 10,000원")
+    @field:Schema(description = "상품명", example = "포인트 10,000원")
     val name: String,
 
-    @Schema(description = "가격", example = "10000")
+    @field:Schema(description = "가격", example = "10000")
     val price: Int,
 
-    @Schema(description = "재고", example = "100")
+    @field:Schema(description = "재고", example = "100")
     val stock: Int,
 
-    @Schema(description = "상품 설명", example = "10,000 포인트 상품")
+    @field:Schema(description = "상품 설명", example = "10,000 포인트 상품")
     val description: String?,
 
-    @Schema(description = "상품 상태", example = "ACTIVE")
+    @field:Schema(description = "상품 상태", example = "ACTIVE")
     val status: ProductStatus,
 
-    @Schema(description = "생성일시", example = "2024-01-01T00:00:00")
+    @field:Schema(description = "생성일시", example = "2026-01-01T00:00:00")
     val createdAt: LocalDateTime,
 
-    @Schema(description = "수정일시", example = "2024-01-01T00:00:00")
+    @field:Schema(description = "수정일시", example = "2026-01-01T00:00:00")
     val updatedAt: LocalDateTime
 ) {
     companion object {

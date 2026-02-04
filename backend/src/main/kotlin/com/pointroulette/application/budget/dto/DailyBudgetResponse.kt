@@ -10,7 +10,7 @@ data class DailyBudgetResponse(
     @field:Schema(description = "예산 ID", example = "1")
     val id: Long,
 
-    @field:Schema(description = "예산 날짜", example = "2024-01-01")
+    @field:Schema(description = "예산 날짜", example = "2026-01-01")
     val budgetDate: LocalDate,
 
     @field:Schema(description = "총 예산 금액", example = "100000")
@@ -19,10 +19,10 @@ data class DailyBudgetResponse(
     @field:Schema(description = "잔여 예산 금액", example = "50000")
     val remainingAmount: Int,
 
-    @field:Schema(description = "생성일시", example = "2024-01-01T00:00:00")
+    @field:Schema(description = "생성일시", example = "2026-01-01T00:00:00")
     val createdAt: LocalDateTime,
 
-    @field:Schema(description = "수정일시", example = "2024-01-01T00:00:00")
+    @field:Schema(description = "수정일시", example = "2026-01-01T00:00:00")
     val updatedAt: LocalDateTime
 ) {
     companion object {

@@ -41,19 +41,19 @@ interface AdminBudgetControllerDocs {
                           "data": [
                             {
                               "id": 1,
-                              "budgetDate": "2024-01-01",
+                              "budgetDate": "2026-01-01",
                               "totalAmount": 100000,
                               "remainingAmount": 100000,
-                              "createdAt": "2024-01-01T00:00:00",
-                              "updatedAt": "2024-01-01T00:00:00"
+                              "createdAt": "2026-01-01T00:00:00",
+                              "updatedAt": "2026-01-01T00:00:00"
                             },
                             {
                               "id": 2,
-                              "budgetDate": "2024-01-02",
+                              "budgetDate": "2026-01-02",
                               "totalAmount": 100000,
                               "remainingAmount": 100000,
-                              "createdAt": "2024-01-01T00:00:00",
-                              "updatedAt": "2024-01-01T00:00:00"
+                              "createdAt": "2026-01-01T00:00:00",
+                              "updatedAt": "2026-01-01T00:00:00"
                             }
                           ]
                         }"""
@@ -105,19 +105,19 @@ interface AdminBudgetControllerDocs {
                             "content": [
                               {
                                 "id": 1,
-                                "budgetDate": "2024-01-01",
+                                "budgetDate": "2026-01-01",
                                 "totalAmount": 100000,
                                 "remainingAmount": 50000,
-                                "createdAt": "2024-01-01T00:00:00",
-                                "updatedAt": "2024-01-01T12:00:00"
+                                "createdAt": "2026-01-01T00:00:00",
+                                "updatedAt": "2026-01-01T12:00:00"
                               },
                               {
                                 "id": 2,
-                                "budgetDate": "2024-01-02",
+                                "budgetDate": "2026-01-02",
                                 "totalAmount": 100000,
                                 "remainingAmount": 100000,
-                                "createdAt": "2024-01-01T00:00:00",
-                                "updatedAt": "2024-01-01T00:00:00"
+                                "createdAt": "2026-01-01T00:00:00",
+                                "updatedAt": "2026-01-01T00:00:00"
                               }
                             ],
                             "totalElements": 2,
