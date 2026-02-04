@@ -217,12 +217,155 @@ Presentation → Application → Domain
 ## 테스트
 
 ### 테스트 전략
+
+#### 1. 테스트 범위 및 목표
 - **Unit Test**: 도메인 로직, 서비스 계층
 - **Integration Test**: Repository, API 엔드포인트
 - **Test Coverage**: 80% 이상 목표
 
+#### 2. 테스트 프레임워크 및 도구
+- **JUnit 5**: 테스트 실행 프레임워크
+- **Mockito**: 모킹 라이브러리
+- **MockMvc**: REST API 테스트 (Controller 계층)
+- **TestContainers**: 실제 PostgreSQL 환경 테스트
+
 ---
 
-## API 명세
+### 테스트 구조
 
-> 상세 API 명세는 Swagger/OpenAPI 문서 참조
+```
+src/test/
+├── kotlin/com.pointroulette/
+│   ├── application/         # 응용 계층 테스트
+│   │   ├── user/
+│   │   │   └── UserServiceTest.kt       # Service 단위 테스트
+│   │   └── point/
+│   │
+│   └── presentation/        # 표현 계층 테스트
+│       └── user/
+│           └── UserControllerTest.kt    # API 통합 테스트
+│
+└── resources/
+    └── application-test.yaml            # 테스트 환경 설정
+```
+
+---
+
+### 계층별 테스트 가이드
+
+#### Application Layer 테스트
+
+**목적**: Service 로직, Use Case 검증
+
+**테스트 대상**:
+- 비즈니스 로직 흐름
+- 트랜잭션 처리
+- 도메인 객체 조합
+- 예외 처리
+
+**테스트 환경**:
+- `@ExtendWith(MockitoExtension::class)` 사용
+- 의존성(Repository 등)은 Mock 객체로 주입
+- 순수 단위 테스트 (외부 의존성 없음)
+
+**테스트 작성 방식**:
+- `@Mock`으로 의존성 모킹
+- `@InjectMocks`로 테스트 대상 주입
+- `given().willReturn()` 패턴으로 Mock 동작 정의
+- `verify()`로 메서드 호출 검증
+- **@Nested**로 각 메서드별 테스트 케이스 그룹화
+
+---
+
+#### Presentation Layer 테스트
+
+**목적**: REST API 엔드포인트, 요청/응답 검증
+
+**테스트 대상**:
+- HTTP 요청/응답 처리
+- 요청 유효성 검증 (Validation)
+- 응답 포맷 확인
+- 예외 처리 및 에러 응답
+
+**테스트 환경**:
+- `@SpringBootTest` + `@AutoConfigureMockMvc` 사용
+- **MockMvc**로 HTTP 요청 시뮬레이션
+- **TestContainers**로 실제 PostgreSQL 환경 구성
+- 실제 Spring Context 로드 (통합 테스트)
+
+**테스트 작성 방식**:
+- `mockMvc.post()`, `mockMvc.get()` 등으로 요청 전송
+- `andExpect()`로 상태 코드, 응답 본문 검증
+- `jsonPath()`로 JSON 응답 필드 검증
+- 각 테스트 전 데이터베이스 초기화 (`@BeforeEach`)
+- **@Nested**로 각 API 엔드포인트별 테스트 그룹화
+
+---
+
+### 테스트 환경 설정
+
+#### TestContainers 설정
+
+**목적**: 실제 PostgreSQL 환경에서 테스트하여 프로덕션과 동일한 환경 보장
+
+**적용 대상**:
+- Repository 테스트 (`@DataJpaTest`)
+- Controller 통합 테스트 (`@SpringBootTest`)
+
+**설정 방법**:
+1. `build.gradle`에 TestContainers 의존성 추가
+2. 테스트 클래스에 `@Testcontainers` 어노테이션 추가
+3. PostgreSQL 컨테이너 정의 및 자동 시작
+
+**장점**:
+- H2와 PostgreSQL의 SQL 방언 차이 문제 해결
+- 실제 DB 제약조건 및 인덱스 동작 검증
+- 프로덕션 환경과 일치하는 테스트
+
+---
+
+#### application-test.yaml
+
+**위치**: `src/test/resources/application-test.yaml`
+
+**목적**: 테스트 전용 프로퍼티 설정
+
+**설정 내용**:
+- TestContainers 데이터소스 설정
+- JPA 로깅 레벨 조정 (SQL 쿼리 확인)
+- 테스트용 트랜잭션 설정
+- Hibernate DDL 설정 (create-drop)
+
+**활성화 방법**:
+- `@ActiveProfiles("test")` 어노테이션 사용
+- 테스트 실행 시 자동으로 test 프로파일 활성화
+
+---
+
+### 테스트 작성 규칙
+
+#### 1. 명명 규칙
+- **테스트 클래스**: `{대상클래스명}Test.kt`
+- **테스트 메서드**: Backtick 활용한 한글 설명
+- **DisplayName**: 계층 및 기능 명시
+
+#### 2. Given-When-Then 패턴 준수
+- **Given**: 테스트 초기 상태 준비 (데이터 생성, Mock 설정)
+- **When**: 테스트할 동작 수행 (메서드 호출, API 요청)
+- **Then**: 결과 검증 (assert, verify)
+
+#### 3. @Nested를 활용한 테스트 구조화
+- 관련된 테스트를 논리적으로 그룹화
+- 각 메서드별, API 엔드포인트별, 시나리오별로 구분
+- 중첩 클래스 내부에서 공통 설정 공유 가능
+- 테스트 리포트의 가독성 향상
+
+#### 4. 테스트 독립성 보장
+- 각 테스트는 다른 테스트에 영향을 주지 않아야 함
+- `@BeforeEach`로 테스트 전 초기화
+- 테스트용 데이터는 각 테스트 메서드 내에서 생성
+
+#### 5. DisplayName 활용
+- 테스트 클래스와 메서드에 `@DisplayName` 추가
+- 테스트 의도를 명확히 표현
+- 테스트 실패 시 원인 파악 용이
