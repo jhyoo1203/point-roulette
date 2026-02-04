@@ -142,6 +142,40 @@ obsidian에서 ERD 확인해서 postgreSQL 기반 DDL을 생성해줘.
 
 ---
 
+### [생산성 향상] 테스트 전략 문서화 및 Claude Code 스킬 생성
+
+**프롬프트**
+```
+테스트 코드를 추가하는 Claude Code 커스텀 명령어를 만들고 싶어.
+- 커스텀 명령어 추가 (FE도 추가하기 쉽게 확장성 있는 문서 작성)
+- [backend/README.md 테스트 섹션 추가]
+   1. 코드 예시는 넣지 않고 텍스트로 정리
+   2. controller는 mockMvc 사용 명시
+   3. test container 사용 + test 프로퍼티 만들기 명시
+   4. @Nested도 명시
+- 로그인 API 테스트 코드 작성으로 Claude Code 스킬 테스트 검증
+```
+
+**설명**
+- 테스트 전략 문서화
+- Claude Code 스킬 생성
+- 이후 테스트 코드 작성 시 스킬 활용
+
+---
+
+### [생산성 향상] 로그인 API 테스트 코드 작성
+
+**프롬프트**
+```
+/test 스킬을 활용하여 백엔드 로그인 API 테스트 코드 작성
+```
+
+**설명**
+- Claude Code의 `/test` 스킬 활용
+- `backend/README.md`의 테스트 전략 참고
+
+---
+
 ## 2. NotebookLM
 _(이후 추가 예정)_
 
