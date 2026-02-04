@@ -34,7 +34,93 @@ obsidian에서 '2026 상반기 유저서비스스쿼드 과제' 문서를 바탕
 **설명**
 - obsidian mcp 활용
 - ERD 초안 설계
-- 이후 휴먼 검수하며 ERD 환성 
+- 이후 휴먼 검수하며 ERD 완성
+
+---
+
+### [설계] Backend 프로젝트 구조 개선
+
+**프롬프트**
+```
+@backend/README.md 프로젝트 구조 이렇게 가져가면 어떨지 리뷰해줘. 파일은 생성하지 말고 텍스트로 설명
+
+[대화 진행]
+Q: 근데 이렇게 하면 나중에 application에 너무 많은 service가 있지 않을까?
+A: [도메인별 패키지 분리 구조 제안 - 3가지 옵션]
+  1. 도메인별로 application도 분리 (추천)
+  2. Use Case 기반 세분화 (CQRS)
+  3. 혼합 전략
+
+Q: // 1단계: 도메인별 패키지 분리부터 시작
+   이거만 적용해도 충분할 것 같아
+
+Q: 이 하위에 application, infrastructure, presentation 등 위치하는건 어떨까
+   (도메인 최상위 구조 제안)
+A: [장단점 비교 및 현실적인 절충안 제시]
+
+최종 결정: 현실적인 절충안 (추천)
+- 계층 구조는 유지 (DIP 원칙)
+- 도메인별 분리도 적용
+- 공통 코드 위치 명확
+- Spring Boot 관례 준수
+
+그럼 이거로 @backend/README.md 다시 정리해줘.
+```
+
+**변경 내용**
+```
+기존 구조:
+application/
+├── service/
+│   ├── UserService.kt
+│   ├── PointService.kt
+│   └── RouletteService.kt  # 모든 Service가 한 폴더에
+└── dto/
+    ├── UserDto.kt
+    └── PointDto.kt         # 모든 DTO가 한 폴더에
+
+개선된 구조:
+application/
+├── user/                   # 도메인별 분리
+│   ├── UserService.kt
+│   └── dto/
+│       ├── UserDto.kt
+│       ├── UserCreateDto.kt
+│       └── UserUpdateDto.kt
+├── point/
+│   ├── PointService.kt
+│   └── dto/
+└── roulette/
+    ├── RouletteService.kt
+    └── dto/
+```
+
+**주요 개선 사항**
+1. **도메인 중심 구조**
+   - domain/, application/, presentation/ 각 계층 내에서 도메인별 패키지 분리
+   - 예: `application/user/`, `application/point/`, `presentation/user/`
+
+2. **공통 코드 관리**
+   - `infrastructure/config/`: JpaConfig, SecurityConfig 등
+   - `presentation/exception/`: GlobalExceptionHandler 등
+
+3. **의존성 규칙 명확화**
+   - Presentation → Application → Domain
+   - Infrastructure는 Domain 인터페이스 구현
+
+4. **테스트 구조도 동일하게 적용**
+   - `test/kotlin/.../domain/user/`, `test/kotlin/.../application/user/`
+
+**설계 원칙**
+- 계층 간 의존성 규칙(DIP) 유지
+- 도메인 경계 명확화로 검색 및 유지보수 용이
+- 단순 CRUD는 Service로 충분, 복잡한 유스케이스만 나중에 UseCase 분리
+- Spring Boot 관례 준수하면서 확장 가능한 구조
+
+**장점**
+- 도메인별로 코드가 그룹화되어 검색 용이
+- Service 파일이 늘어나도 도메인별로 관리되어 혼란 없음
+- 마이크로서비스 전환 시 도메인 단위로 분리 가능
 
 ---
 
