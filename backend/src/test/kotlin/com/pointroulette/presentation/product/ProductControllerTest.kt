@@ -2,7 +2,9 @@ package com.pointroulette.presentation.product
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.pointroulette.application.order.dto.OrderCreateRequest
+import com.pointroulette.domain.order.Order
 import com.pointroulette.domain.order.OrderRepository
+import com.pointroulette.domain.order.OrderStatus
 import com.pointroulette.domain.point.Point
 import com.pointroulette.domain.point.PointRepository
 import com.pointroulette.domain.point.PointSourceType
@@ -301,6 +303,135 @@ class ProductControllerTest {
                     content = objectMapper.writeValueAsString(request)
                 }.andExpect {
                     status { isBadRequest() }
+                }
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /api/v1/products/orders/{userId}")
+    inner class GetOrderHistoryApiTest {
+
+        @Nested
+        @DisplayName("성공 케이스")
+        inner class SuccessTest {
+
+            @Test
+            @DisplayName("사용자의 주문 내역을 페이징하여 최신순으로 조회한다")
+            fun `should return order history in descending order by creation date with pagination`() {
+                // Given
+                val user = userRepository.save(
+                    User(nickname = "testuser", currentPoint = 10000)
+                )
+                val product1 = productRepository.save(
+                    Product(name = "상품1", price = 5000, stock = 100, status = ProductStatus.ACTIVE)
+                )
+                val product2 = productRepository.save(
+                    Product(name = "상품2", price = 3000, stock = 50, status = ProductStatus.ACTIVE)
+                )
+
+                // 주문 생성 (오래된 순서대로)
+                val order1 = orderRepository.save(
+                    Order(
+                        user = user,
+                        product = product1,
+                        quantity = 1,
+                        totalPrice = 5000,
+                        status = OrderStatus.COMPLETED
+                    )
+                )
+                Thread.sleep(10) // 생성 시간 차이를 위해 짧은 대기
+                val order2 = orderRepository.save(
+                    Order(
+                        user = user,
+                        product = product2,
+                        quantity = 2,
+                        totalPrice = 6000,
+                        status = OrderStatus.COMPLETED
+                    )
+                )
+
+                // When & Then
+                mockMvc.get("/api/v1/products/orders/${user.id}?page=0&size=10") {
+                    accept = MediaType.APPLICATION_JSON
+                }.andExpect {
+                    status { isOk() }
+                    jsonPath("$.httpStatus") { value(200) }
+                    jsonPath("$.data.content.length()") { value(2) }
+                    jsonPath("$.data.totalElements") { value(2) }
+                    // 최신순이므로 order2가 먼저
+                    jsonPath("$.data.content[0].id") { value(order2.id) }
+                    jsonPath("$.data.content[0].productName") { value("상품2") }
+                    jsonPath("$.data.content[0].totalPrice") { value(6000) }
+                    jsonPath("$.data.content[0].status") { value("COMPLETED") }
+                    jsonPath("$.data.content[1].id") { value(order1.id) }
+                    jsonPath("$.data.content[1].productName") { value("상품1") }
+                    jsonPath("$.data.content[1].totalPrice") { value(5000) }
+                }
+            }
+
+            @Test
+            @DisplayName("주문 내역이 없는 사용자는 빈 페이지를 반환한다")
+            fun `should return empty page when user has no orders`() {
+                // Given
+                val user = userRepository.save(
+                    User(nickname = "newuser", currentPoint = 0)
+                )
+
+                // When & Then
+                mockMvc.get("/api/v1/products/orders/${user.id}") {
+                    accept = MediaType.APPLICATION_JSON
+                }.andExpect {
+                    status { isOk() }
+                    jsonPath("$.httpStatus") { value(200) }
+                    jsonPath("$.data.content.length()") { value(0) }
+                    jsonPath("$.data.totalElements") { value(0) }
+                }
+            }
+
+            @Test
+            @DisplayName("취소된 주문도 내역에 포함된다")
+            fun `should include cancelled orders in order history`() {
+                // Given
+                val user = userRepository.save(
+                    User(nickname = "testuser", currentPoint = 5000)
+                )
+                val product = productRepository.save(
+                    Product(name = "상품1", price = 5000, stock = 100, status = ProductStatus.ACTIVE)
+                )
+
+                val completedOrder = orderRepository.save(
+                    Order(
+                        user = user,
+                        product = product,
+                        quantity = 1,
+                        totalPrice = 5000,
+                        status = OrderStatus.COMPLETED
+                    )
+                )
+                Thread.sleep(10)
+                val cancelledOrder = orderRepository.save(
+                    Order(
+                        user = user,
+                        product = product,
+                        quantity = 1,
+                        totalPrice = 5000,
+                        status = OrderStatus.CANCELLED
+                    )
+                )
+
+                // When & Then
+                mockMvc.get("/api/v1/products/orders/${user.id}") {
+                    accept = MediaType.APPLICATION_JSON
+                }.andExpect {
+                    status { isOk() }
+                    jsonPath("$.httpStatus") { value(200) }
+                    jsonPath("$.data.content.length()") { value(2) }
+                    // 최신순이므로 cancelledOrder가 먼저
+                    jsonPath("$.data.content[0].id") { value(cancelledOrder.id) }
+                    jsonPath("$.data.content[0].status") { value("CANCELLED") }
+                    jsonPath("$.data.content[1].id") { value(completedOrder.id) }
+                    jsonPath("$.data.content[1].status") { value("COMPLETED") }
                 }
             }
         }
