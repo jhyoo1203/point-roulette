@@ -112,4 +112,42 @@ class PointHistoryService(
 
         return pointHistoryRepository.save(pointHistory)
     }
+
+    /**
+     * 포인트 회수 이력을 기록합니다 (룰렛 참여 취소 시).
+     *
+     * @param user 사용자 엔티티
+     * @param point 회수된 Point 엔티티
+     * @param amount 회수 금액 (음수로 기록)
+     * @param balanceAfter 회수 후 잔액
+     * @param sourceType 포인트 획득 경로
+     * @param sourceId 포인트 획득 참조 ID
+     * @return 생성된 PointHistory 엔티티
+     */
+    @Transactional
+    fun recordReclaimHistory(
+        user: User,
+        point: Point,
+        amount: Int,
+        balanceAfter: Int,
+        sourceType: PointSourceType,
+        sourceId: Long
+    ): PointHistory {
+        val referenceType = when (sourceType) {
+            PointSourceType.ROULETTE -> ReferenceType.ROULETTE
+            PointSourceType.REFUND -> ReferenceType.ORDER
+        }
+
+        val pointHistory = PointHistory(
+            user = user,
+            point = point,
+            amount = amount,
+            transactionType = TransactionType.CANCEL,
+            referenceType = referenceType,
+            referenceId = sourceId,
+            balanceAfter = balanceAfter
+        )
+
+        return pointHistoryRepository.save(pointHistory)
+    }
 }

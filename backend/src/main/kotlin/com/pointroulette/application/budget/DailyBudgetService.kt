@@ -98,4 +98,22 @@ class DailyBudgetService(
         return dailyBudgetRepository.findByBudgetDate(LocalDate.now())
             ?: throw BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "오늘의 예산이 존재하지 않습니다.")
     }
+
+    /**
+     * 예산을 복구합니다 (룰렛 참여 취소 시).
+     * 낙관적 락 실패 시 최대 3회 자동 재시도합니다.
+     *
+     * @param budget 복구할 DailyBudget 엔티티
+     * @param amount 복구할 금액
+     */
+    @Transactional
+    @Retryable(
+        retryFor = [ObjectOptimisticLockingFailureException::class],
+        maxAttempts = 3,
+        backoff = Backoff(delay = 50, multiplier = 2.0, maxDelay = 200)
+    )
+    fun refundBudget(budget: DailyBudget, amount: Int) {
+        budget.remainingAmount += amount
+        dailyBudgetRepository.save(budget)
+    }
 }

@@ -25,4 +25,13 @@ interface PointRepository : JpaRepository<Point, Long> {
         ORDER BY p.expiresAt ASC, p.id ASC
     """)
     fun findAvailablePointsByUserId(userId: Long): List<Point>
+
+    /**
+     * 특정 소스로 획득한 포인트 조회
+     */
+    fun findByUserIdAndSourceTypeAndSourceId(
+        userId: Long,
+        sourceType: PointSourceType,
+        sourceId: Long
+    ): Point?
 }

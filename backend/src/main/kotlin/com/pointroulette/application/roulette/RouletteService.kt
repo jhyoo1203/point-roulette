@@ -102,4 +102,43 @@ class RouletteService(
         )
     }
 
+    /**
+     * 룰렛 참여를 취소합니다. (관리자 전용)
+     * - 룰렛 참여 이력 상태를 CANCELLED로 변경합니다.
+     * - 예산을 복구합니다.
+     * - 획득한 포인트를 회수합니다 (사용자의 포인트에서 차감).
+     *
+     * @param historyId 룰렛 참여 이력 ID
+     * @return 취소된 룰렛 참여 이력 응답
+     * @throws IllegalStateException 이미 취소된 참여인 경우
+     */
+    @Transactional
+    fun cancelParticipation(historyId: Long): RouletteHistoryResponse {
+        val history = rouletteHistoryRepository.findById(historyId)
+            .orElseThrow { throw com.pointroulette.presentation.exception.ResourceNotFoundException("룰렛 참여 이력을 찾을 수 없습니다. (ID: $historyId)") }
+
+        // 이미 취소된 참여인지 확인
+        if (history.status == RouletteStatus.CANCELLED) {
+            throw IllegalStateException("이미 취소된 룰렛 참여입니다.")
+        }
+
+        // 참여 상태 변경
+        history.status = RouletteStatus.CANCELLED
+
+        // 예산 복구
+        dailyBudgetService.refundBudget(history.dailyBudget, history.wonAmount)
+
+        // 포인트 회수 (획득한 포인트를 사용자 잔액에서 차감)
+        pointService.reclaimPoints(
+            userId = history.user.id,
+            amount = history.wonAmount,
+            sourceType = PointSourceType.ROULETTE,
+            sourceId = historyId
+        )
+
+        log.info("룰렛 참여 취소 성공: historyId=$historyId, userId=${history.user.id}, reclaimedAmount=${history.wonAmount}")
+
+        return RouletteHistoryResponse.from(history)
+    }
+
 }

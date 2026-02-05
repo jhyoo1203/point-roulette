@@ -173,4 +173,57 @@ class PointService(
 
         return savedPoint
     }
+
+    /**
+     * 포인트를 회수합니다 (룰렛 참여 취소 시).
+     * - User의 currentPoint가 감소합니다.
+     * - 특정 sourceId로 획득한 포인트를 찾아서 삭제합니다.
+     * - 포인트 회수 이력(PointHistory)이 기록됩니다.
+     *
+     * @param userId 사용자 ID
+     * @param amount 회수할 포인트 금액 (0보다 커야 함)
+     * @param sourceType 포인트 획득 경로
+     * @param sourceId 포인트 획득 참조 ID
+     * @throws IllegalArgumentException amount가 0 이하인 경우
+     * @throws InsufficientPointException 포인트 부족으로 회수할 수 없는 경우
+     */
+    @Transactional
+    fun reclaimPoints(
+        userId: Long,
+        amount: Int,
+        sourceType: PointSourceType,
+        sourceId: Long
+    ) {
+        require(amount > 0) { "회수 포인트는 0보다 커야 합니다" }
+
+        val user = userService.getUser(userId)
+
+        // 해당 sourceId로 획득한 포인트 찾기
+        val pointToReclaim = pointRepository.findByUserIdAndSourceTypeAndSourceId(userId, sourceType, sourceId)
+            ?: throw IllegalStateException("회수할 포인트를 찾을 수 없습니다. (sourceId: $sourceId)")
+
+        // 포인트가 일부 또는 전체 사용된 경우 고려
+        val reclaimAmount = minOf(amount, user.currentPoint)
+
+        if (reclaimAmount < amount) {
+            throw InsufficientPointException(user.currentPoint, amount)
+        }
+
+        // User의 현재 포인트 감소
+        user.updateCurrentPoint(-reclaimAmount)
+
+        // 포인트 엔티티 상태 변경 (취소됨)
+        pointToReclaim.status = PointStatus.CANCELLED
+        pointToReclaim.remainingAmount = 0
+
+        // 회수 이력 기록 (음수로 기록)
+        pointHistoryService.recordReclaimHistory(
+            user = user,
+            point = pointToReclaim,
+            amount = -reclaimAmount,
+            balanceAfter = user.currentPoint,
+            sourceType = sourceType,
+            sourceId = sourceId
+        )
+    }
 }
