@@ -8,6 +8,7 @@ import com.pointroulette.domain.point.PointRepository
 import com.pointroulette.domain.roulette.RouletteHistoryRepository
 import com.pointroulette.domain.user.User
 import com.pointroulette.domain.user.UserRepository
+import com.pointroulette.helper.DatabaseCleaner
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -55,13 +56,12 @@ class RouletteControllerTest {
     @Autowired
     private lateinit var pointHistoryRepository: PointHistoryRepository
 
+    @Autowired
+    private lateinit var databaseCleaner: DatabaseCleaner
+
     @BeforeEach
     fun setUp() {
-        rouletteHistoryRepository.deleteAll()
-        pointHistoryRepository.deleteAll()
-        pointRepository.deleteAll()
-        dailyBudgetRepository.deleteAll()
-        userRepository.deleteAll()
+        databaseCleaner.clear()
     }
 
     @Nested

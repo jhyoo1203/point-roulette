@@ -6,6 +6,7 @@ import com.pointroulette.application.product.dto.ProductUpdateRequest
 import com.pointroulette.domain.product.Product
 import com.pointroulette.domain.product.ProductRepository
 import com.pointroulette.domain.product.ProductStatus
+import com.pointroulette.helper.DatabaseCleaner
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -42,9 +43,12 @@ class AdminProductControllerTest {
     @Autowired
     private lateinit var productRepository: ProductRepository
 
+    @Autowired
+    private lateinit var databaseCleaner: DatabaseCleaner
+
     @BeforeEach
     fun setUp() {
-        productRepository.deleteAll()
+        databaseCleaner.clear()
     }
 
     @Nested
