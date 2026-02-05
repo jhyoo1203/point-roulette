@@ -10,7 +10,9 @@ import com.pointroulette.domain.roulette.RouletteHistory
 import com.pointroulette.domain.roulette.RouletteHistoryRepository
 import com.pointroulette.domain.roulette.RouletteStatus
 import com.pointroulette.domain.user.User
+import com.pointroulette.helper.TestEntityFactory
 import com.pointroulette.infrastructure.util.RandomPointGenerator
+import com.pointroulette.presentation.exception.ResourceNotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
@@ -26,6 +28,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.springframework.dao.DataIntegrityViolationException
 import java.time.LocalDate
+import java.util.Optional
 
 /**
  * RouletteService 단위 테스트
@@ -315,6 +318,125 @@ class RouletteServiceTest {
                 assertThat(response.todayRemainingBudget).isEqualTo(0)
 
                 verify(dailyBudgetService).getTodayBudget()
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("cancelParticipation 메서드")
+    inner class CancelParticipationTest {
+
+        @Nested
+        @DisplayName("성공 케이스")
+        inner class SuccessTest {
+
+            @Test
+            @DisplayName("룰렛 참여를 취소하고 포인트를 회수한다")
+            fun `should cancel participation and reclaim points successfully`() {
+                // given
+                val historyId = 1L
+                val userId = 1L
+                val today = LocalDate.now()
+                val wonAmount = 500
+
+                val user = TestEntityFactory.createUser(userId, "테스트유저")
+                val budget = TestEntityFactory.createDailyBudget(1L, today, 100_000, 99_500)
+                val history = TestEntityFactory.createRouletteHistory(
+                    historyId, user, today, wonAmount, budget, RouletteStatus.SUCCESS
+                )
+
+                given(rouletteHistoryRepository.findById(historyId))
+                    .willReturn(Optional.of(history))
+
+                // when
+                val response = rouletteService.cancelParticipation(historyId)
+
+                // then
+                assertThat(response.id).isEqualTo(historyId)
+                assertThat(response.status).isEqualTo(RouletteStatus.CANCELLED.name)
+                assertThat(history.status).isEqualTo(RouletteStatus.CANCELLED)
+
+                verify(rouletteHistoryRepository).findById(historyId)
+                verify(dailyBudgetService).refundBudget(budget, wonAmount)
+                verify(pointService).reclaimPoints(
+                    eq(userId),
+                    eq(wonAmount),
+                    eq(PointSourceType.ROULETTE),
+                    eq(historyId)
+                )
+            }
+
+            @Test
+            @DisplayName("예산이 복구된다")
+            fun `should restore budget when cancelling participation`() {
+                // given
+                val historyId = 1L
+                val userId = 1L
+                val today = LocalDate.now()
+                val wonAmount = 750
+
+                val user = TestEntityFactory.createUser(userId, "테스트유저")
+                val budget = TestEntityFactory.createDailyBudget(1L, today, 100_000, 50_000)
+                val history = TestEntityFactory.createRouletteHistory(
+                    historyId, user, today, wonAmount, budget, RouletteStatus.SUCCESS
+                )
+
+                given(rouletteHistoryRepository.findById(historyId))
+                    .willReturn(Optional.of(history))
+
+                // when
+                rouletteService.cancelParticipation(historyId)
+
+                // then
+                verify(dailyBudgetService).refundBudget(budget, wonAmount)
+            }
+        }
+
+        @Nested
+        @DisplayName("실패 케이스")
+        inner class FailureTest {
+
+            @Test
+            @DisplayName("참여 이력을 찾을 수 없으면 ResourceNotFoundException 예외를 발생시킨다")
+            fun `should throw ResourceNotFoundException when history not found`() {
+                // given
+                val historyId = 999L
+
+                given(rouletteHistoryRepository.findById(historyId))
+                    .willReturn(Optional.empty())
+
+                // when & then
+                assertThatThrownBy { rouletteService.cancelParticipation(historyId) }
+                    .isInstanceOf(ResourceNotFoundException::class.java)
+                    .hasMessageContaining("룰렛 참여 이력을 찾을 수 없습니다")
+
+                verify(rouletteHistoryRepository).findById(historyId)
+            }
+
+            @Test
+            @DisplayName("이미 취소된 참여는 IllegalStateException 예외를 발생시킨다")
+            fun `should throw IllegalStateException when already cancelled`() {
+                // given
+                val historyId = 1L
+                val userId = 1L
+                val today = LocalDate.now()
+                val wonAmount = 500
+
+                val user = TestEntityFactory.createUser(userId, "테스트유저")
+                val budget = TestEntityFactory.createDailyBudget(1L, today, 100_000, 99_500)
+                val history = TestEntityFactory.createRouletteHistory(
+                    historyId, user, today, wonAmount, budget, RouletteStatus.CANCELLED
+                )
+
+                given(rouletteHistoryRepository.findById(historyId))
+                    .willReturn(Optional.of(history))
+
+                // when & then
+                assertThatThrownBy { rouletteService.cancelParticipation(historyId) }
+                    .isInstanceOf(IllegalStateException::class.java)
+                    .hasMessage("이미 취소된 룰렛 참여입니다.")
+
+                verify(rouletteHistoryRepository).findById(historyId)
             }
         }
     }
