@@ -1,5 +1,6 @@
 package com.pointroulette.presentation.exception
 
-class BusinessException (
-    val errorCode: ErrorCode
-) : RuntimeException()
+open class BusinessException(
+    val errorCode: ErrorCode,
+    message: String? = null
+) : RuntimeException(message ?: errorCode.message)

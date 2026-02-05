@@ -10,4 +10,5 @@ import java.time.LocalDate
 interface DailyBudgetRepository : JpaRepository<DailyBudget, Long> {
     fun findByBudgetDateBetween(startDate: LocalDate, endDate: LocalDate, pageable: Pageable): Page<DailyBudget>
     fun existsByBudgetDate(budgetDate: LocalDate): Boolean
+    fun findByBudgetDate(budgetDate: LocalDate): DailyBudget?
 }
