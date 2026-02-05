@@ -98,6 +98,7 @@ class RouletteConcurrencyTest {
 
         latch.await()
         executorService.shutdown()
+        executorService.awaitTermination(10, java.util.concurrent.TimeUnit.SECONDS)
 
         // then
         val finalBudget = dailyBudgetRepository.findByBudgetDate(today)!!
@@ -152,6 +153,7 @@ class RouletteConcurrencyTest {
 
         latch.await()
         executorService.shutdown()
+        executorService.awaitTermination(10, java.util.concurrent.TimeUnit.SECONDS)
 
         // then
         val participated = rouletteHistoryRepository.existsByUserIdAndParticipatedDate(user.id, today)
@@ -202,6 +204,7 @@ class RouletteConcurrencyTest {
 
         latch.await()
         executorService.shutdown()
+        executorService.awaitTermination(10, java.util.concurrent.TimeUnit.SECONDS)
 
         // then
         val finalBudget = dailyBudgetRepository.findByBudgetDate(today)!!
@@ -255,6 +258,7 @@ class RouletteConcurrencyTest {
 
         latch.await()
         executorService.shutdown()
+        executorService.awaitTermination(10, java.util.concurrent.TimeUnit.SECONDS)
 
         // then
         val finalBudget = dailyBudgetRepository.findByBudgetDate(today)!!
