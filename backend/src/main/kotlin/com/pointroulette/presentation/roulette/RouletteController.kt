@@ -1,10 +1,10 @@
-package com.pointroulette.presentation.user
+package com.pointroulette.presentation.roulette
 
 import com.pointroulette.application.roulette.RouletteService
 import com.pointroulette.application.roulette.dto.RouletteParticipateResponse
 import com.pointroulette.application.roulette.dto.RouletteStatusResponse
 import com.pointroulette.presentation.common.dto.ResponseData
-import com.pointroulette.presentation.user.swagger.RouletteControllerDocs
+import com.pointroulette.presentation.roulette.swagger.RouletteControllerDocs
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*

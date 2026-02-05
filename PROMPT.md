@@ -241,6 +241,27 @@ A: [RouletteService에 @Retryable 적용 검토]
 
 ---
 
+### [생산성 향상] 동시성 테스트 컨벤션 문서화
+
+**프롬프트**
+```
+@backend/src/test/kotlin/com/pointroulette/application/roulette/RouletteConcurrencyTest.kt
+
+이 테스트 확인해서 @backend/README.md 에 동시성 테스트에 관한 컨벤션도 적립해줘.
+더 나은 방식이 있으면 그 방식으로 수정. 문서 작성 시 코드 예시는 금지.
+```
+
+**설명**
+- 동시성 테스트 코드 개선 (`awaitTermination()` 추가로 스레드 풀 정리 강화)
+- backend/README.md에 "동시성 테스트 가이드" 섹션 추가
+   - 테스트 목적, 대상, 환경 설정
+   - 테스트 도구 (CountDownLatch, ExecutorService, AtomicInteger)
+   - 테스트 작성 패턴 (스레드 풀 생성 → 동시 실행 → 결과 집계 → 검증)
+   - 주의사항 (타임아웃, 예외 처리, 스레드 수, 안정성, 성능 vs 정확성)
+- 코드 예시 없이 개념과 가이드라인으로만 문서화
+
+---
+
 ## 2. NotebookLM
 _(이후 추가 예정)_
 

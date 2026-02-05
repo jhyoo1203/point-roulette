@@ -2,6 +2,9 @@ package com.pointroulette.presentation.user
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.pointroulette.application.user.dto.LoginRequest
+import com.pointroulette.domain.point.PointHistoryRepository
+import com.pointroulette.domain.point.PointRepository
+import com.pointroulette.domain.roulette.RouletteHistoryRepository
 import com.pointroulette.domain.user.UserRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -36,8 +39,20 @@ class UserControllerTest {
     @Autowired
     private lateinit var userRepository: UserRepository
 
+    @Autowired
+    private lateinit var rouletteHistoryRepository: RouletteHistoryRepository
+
+    @Autowired
+    private lateinit var pointRepository: PointRepository
+
+    @Autowired
+    private lateinit var pointHistoryRepository: PointHistoryRepository
+
     @BeforeEach
     fun setUp() {
+        rouletteHistoryRepository.deleteAll()
+        pointHistoryRepository.deleteAll()
+        pointRepository.deleteAll()
         userRepository.deleteAll()
     }
 

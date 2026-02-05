@@ -1,4 +1,4 @@
-package com.pointroulette.presentation.user.swagger
+package com.pointroulette.presentation.roulette.swagger
 
 import com.pointroulette.application.roulette.dto.RouletteParticipateResponse
 import com.pointroulette.application.roulette.dto.RouletteStatusResponse
