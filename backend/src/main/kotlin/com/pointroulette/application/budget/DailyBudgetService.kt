@@ -13,6 +13,11 @@ import org.springframework.transaction.annotation.Transactional
 class DailyBudgetService(
     private val dailyBudgetRepository: DailyBudgetRepository
 ) {
+
+    companion object {
+        private const val BUDGET_AMOUNT = 100_000
+    }
+
     /**
      * 날짜 범위로 일일 예산 생성 (JPA Batch Insert)
      * - 이미 존재하는 날짜는 건너뜀
@@ -26,7 +31,7 @@ class DailyBudgetService(
         // 생성할 예산 목록 수집 (이미 존재하는 날짜는 제외)
         while (!currentDate.isAfter(request.endDate)) {
             if (!dailyBudgetRepository.existsByBudgetDate(currentDate)) {
-                val dailyBudget = DailyBudget(currentDate, 100_000, 100_000)
+                val dailyBudget = DailyBudget(currentDate, BUDGET_AMOUNT, BUDGET_AMOUNT)
                 budgetsToCreate.add(dailyBudget)
             }
             currentDate = currentDate.plusDays(1)
