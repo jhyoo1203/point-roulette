@@ -94,6 +94,19 @@ class GlobalExceptionHandler {
     }
 
     /**
+     * IllegalStateException 처리 (비즈니스 로직 상태 오류)
+     */
+    @ExceptionHandler(IllegalStateException::class)
+    fun handleIllegalStateException(
+        ex: IllegalStateException
+    ): ResponseEntity<ResponseData<Nothing>> {
+        val response = ResponseData.error<Nothing>(ErrorCode.BUSINESS_ERROR)
+        val caller = getCallerInfo(ex)
+        log.warn("$caller - Illegal state: ${ex.message}")
+        return ResponseEntity.status(ErrorCode.BUSINESS_ERROR.httpStatus).body(response)
+    }
+
+    /**
      * 기타 예외 처리
      */
     @ExceptionHandler(Exception::class)
