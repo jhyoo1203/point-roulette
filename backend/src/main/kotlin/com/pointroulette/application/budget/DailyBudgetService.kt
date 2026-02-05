@@ -6,8 +6,15 @@ import com.pointroulette.application.budget.dto.DailyBudgetSearchRequest
 import com.pointroulette.common.model.PaginationResponse
 import com.pointroulette.domain.budget.DailyBudget
 import com.pointroulette.domain.budget.DailyBudgetRepository
+import com.pointroulette.domain.roulette.RouletteParticipationException
+import com.pointroulette.presentation.exception.BusinessException
+import com.pointroulette.presentation.exception.ErrorCode
+import org.springframework.orm.ObjectOptimisticLockingFailureException
+import org.springframework.retry.annotation.Backoff
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 class DailyBudgetService(
@@ -54,5 +61,41 @@ class DailyBudgetService(
         )
 
         return PaginationResponse.from(page, DailyBudgetResponse::from)
+    }
+
+    /**
+     * 예산을 차감합니다.
+     * 낙관적 락 실패 시 최대 3회 자동 재시도합니다. (delay=50ms, multiplier=2.0, maxDelay=200ms)
+     *
+     * @param budget 차감할 DailyBudget 엔티티
+     * @param amount 차감할 금액
+     * @return true: 차감 성공
+     * @throws RouletteParticipationException 예산 부족 시
+     */
+    @Transactional
+    @Retryable(
+        retryFor = [ObjectOptimisticLockingFailureException::class],
+        maxAttempts = 3,
+        backoff = Backoff(delay = 50, multiplier = 2.0, maxDelay = 200)
+    )
+    fun deductBudget(budget: DailyBudget, amount: Int): Boolean {
+        if (budget.remainingAmount < amount) {
+            throw RouletteParticipationException("예산이 부족합니다.")
+        }
+
+        budget.remainingAmount -= amount
+        dailyBudgetRepository.save(budget)
+        return true
+    }
+
+    /**
+     * 오늘의 예산을 조회합니다 (읽기 전용).
+     * @return 오늘의 DailyBudget
+     * @throws BusinessException 오늘의 예산이 존재하지 않을 경우
+     */
+    @Transactional(readOnly = true)
+    fun getTodayBudget(): DailyBudget {
+        return dailyBudgetRepository.findByBudgetDate(LocalDate.now())
+            ?: throw BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "오늘의 예산이 존재하지 않습니다.")
     }
 }
