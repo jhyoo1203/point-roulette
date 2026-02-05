@@ -2,8 +2,10 @@ package com.pointroulette.application.order
 
 import com.pointroulette.application.order.dto.OrderCreateRequest
 import com.pointroulette.application.order.dto.OrderResponse
+import com.pointroulette.application.order.dto.OrderSearchRequest
 import com.pointroulette.application.point.PointService
 import com.pointroulette.application.user.UserService
+import com.pointroulette.common.model.PaginationResponse
 import com.pointroulette.domain.order.Order
 import com.pointroulette.domain.order.OrderRepository
 import com.pointroulette.domain.order.OrderStatus
@@ -113,5 +115,20 @@ class OrderService(
         )
 
         return OrderResponse.from(order)
+    }
+
+    /**
+     * 사용자의 주문 내역을 페이징하여 조회합니다.
+     * - 최신순으로 정렬
+     *
+     * @param userId 사용자 ID
+     * @param searchRequest 검색 조건 (페이징, 정렬)
+     * @return 주문 내역 페이징 응답
+     */
+    @Transactional(readOnly = true)
+    fun getOrderHistory(userId: Long, searchRequest: OrderSearchRequest): PaginationResponse<OrderResponse> {
+        val pageable = searchRequest.toPageable()
+        val page = orderRepository.findAllByUserId(userId, pageable)
+        return PaginationResponse.from(page, OrderResponse::from)
     }
 }

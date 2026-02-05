@@ -1,6 +1,7 @@
 package com.pointroulette.application.order
 
 import com.pointroulette.application.order.dto.OrderCreateRequest
+import com.pointroulette.application.order.dto.OrderSearchRequest
 import com.pointroulette.application.point.PointService
 import com.pointroulette.application.user.UserService
 import com.pointroulette.domain.order.Order
@@ -24,6 +25,8 @@ import org.mockito.BDDMockito.verify
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import java.util.Optional
 
 /**
@@ -288,6 +291,146 @@ class OrderServiceTest {
             assertThatThrownBy { orderService.cancelOrder(orderId) }
                 .isInstanceOf(IllegalStateException::class.java)
                 .hasMessageContaining("이미 취소된 주문입니다")
+        }
+    }
+
+    @Nested
+    @DisplayName("getOrderHistory 메서드")
+    inner class GetOrderHistoryTest {
+
+        @Test
+        @DisplayName("사용자의 주문 내역을 페이징하여 최신순으로 조회한다")
+        fun `should return order history in descending order by creation date with pagination`() {
+            // Given
+            val userId = 1L
+            val searchRequest = OrderSearchRequest(page = 0, size = 10)
+            val pageable = searchRequest.toPageable()
+
+            val user = TestEntityFactory.createUser(
+                id = userId,
+                nickname = "testuser",
+                currentPoint = 10000
+            )
+            val product1 = TestEntityFactory.createProduct(
+                id = 1L,
+                name = "상품1",
+                price = 5000,
+                stock = 100,
+                status = ProductStatus.ACTIVE
+            )
+            val product2 = TestEntityFactory.createProduct(
+                id = 2L,
+                name = "상품2",
+                price = 3000,
+                stock = 50,
+                status = ProductStatus.ACTIVE
+            )
+
+            val order1 = TestEntityFactory.createOrder(
+                id = 1L,
+                user = user,
+                product = product1,
+                quantity = 1,
+                totalPrice = 5000,
+                status = OrderStatus.COMPLETED
+            )
+            val order2 = TestEntityFactory.createOrder(
+                id = 2L,
+                user = user,
+                product = product2,
+                quantity = 2,
+                totalPrice = 6000,
+                status = OrderStatus.COMPLETED
+            )
+
+            val orders = listOf(order2, order1) // 최신순 (id 2가 먼저)
+            val page = PageImpl(orders, pageable, 2)
+
+            given(orderRepository.findAllByUserId(userId, pageable)).willReturn(page)
+
+            // When
+            val response = orderService.getOrderHistory(userId, searchRequest)
+
+            // Then
+            assertThat(response.content).hasSize(2)
+            assertThat(response.content[0].id).isEqualTo(2L)
+            assertThat(response.content[0].productName).isEqualTo("상품2")
+            assertThat(response.content[0].totalPrice).isEqualTo(6000)
+            assertThat(response.content[1].id).isEqualTo(1L)
+            assertThat(response.content[1].productName).isEqualTo("상품1")
+            assertThat(response.content[1].totalPrice).isEqualTo(5000)
+            assertThat(response.totalElements).isEqualTo(2)
+        }
+
+        @Test
+        @DisplayName("주문 내역이 없는 사용자는 빈 페이지를 반환한다")
+        fun `should return empty page when user has no orders`() {
+            // Given
+            val userId = 1L
+            val searchRequest = OrderSearchRequest(page = 0, size = 10)
+            val pageable = searchRequest.toPageable()
+            val emptyPage = PageImpl<Order>(emptyList(), pageable, 0)
+
+            given(orderRepository.findAllByUserId(userId, pageable)).willReturn(emptyPage)
+
+            // When
+            val response = orderService.getOrderHistory(userId, searchRequest)
+
+            // Then
+            assertThat(response.content).isEmpty()
+            assertThat(response.totalElements).isEqualTo(0)
+        }
+
+        @Test
+        @DisplayName("취소된 주문도 내역에 포함된다")
+        fun `should include cancelled orders in order history`() {
+            // Given
+            val userId = 1L
+            val searchRequest = OrderSearchRequest(page = 0, size = 10)
+            val pageable = searchRequest.toPageable()
+
+            val user = TestEntityFactory.createUser(
+                id = userId,
+                nickname = "testuser",
+                currentPoint = 5000
+            )
+            val product = TestEntityFactory.createProduct(
+                id = 1L,
+                name = "상품1",
+                price = 5000,
+                stock = 100,
+                status = ProductStatus.ACTIVE
+            )
+
+            val completedOrder = TestEntityFactory.createOrder(
+                id = 1L,
+                user = user,
+                product = product,
+                quantity = 1,
+                totalPrice = 5000,
+                status = OrderStatus.COMPLETED
+            )
+            val cancelledOrder = TestEntityFactory.createOrder(
+                id = 2L,
+                user = user,
+                product = product,
+                quantity = 1,
+                totalPrice = 5000,
+                status = OrderStatus.CANCELLED
+            )
+
+            val orders = listOf(cancelledOrder, completedOrder)
+            val page = PageImpl(orders, pageable, 2)
+
+            given(orderRepository.findAllByUserId(userId, pageable)).willReturn(page)
+
+            // When
+            val response = orderService.getOrderHistory(userId, searchRequest)
+
+            // Then
+            assertThat(response.content).hasSize(2)
+            assertThat(response.content[0].status).isEqualTo(OrderStatus.CANCELLED)
+            assertThat(response.content[1].status).isEqualTo(OrderStatus.COMPLETED)
         }
     }
 }

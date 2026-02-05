@@ -84,4 +84,12 @@ class SwaggerConfig(
             .pathsToMatch("/api/v1/admin/roulette/**")
             .build()
     }
+
+    @Bean
+    fun pointApi(): GroupedOpenApi {
+        return GroupedOpenApi.builder()
+            .group("point-api")
+            .pathsToMatch("/api/v1/points/**")
+            .build()
+    }
 }

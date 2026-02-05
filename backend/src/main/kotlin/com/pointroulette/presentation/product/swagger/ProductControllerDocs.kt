@@ -2,6 +2,7 @@ package com.pointroulette.presentation.product.swagger
 
 import com.pointroulette.application.order.dto.OrderCreateRequest
 import com.pointroulette.application.order.dto.OrderResponse
+import com.pointroulette.application.order.dto.OrderSearchRequest
 import com.pointroulette.application.product.dto.ProductResponse
 import com.pointroulette.application.product.dto.ProductSearchRequest
 import com.pointroulette.common.model.PaginationResponse
@@ -82,4 +83,33 @@ interface ProductControllerDocs {
         )
         request: OrderCreateRequest
     ): ResponseEntity<ResponseData<OrderResponse>>
+
+    @Operation(
+        summary = "주문 내역 조회",
+        description = """
+            사용자의 주문 내역을 페이징하여 조회합니다.
+            - 최신순으로 정렬
+            - 주문 상태 포함
+        """
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "조회 성공",
+                content = [Content(schema = Schema(implementation = PaginationResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "사용자를 찾을 수 없음",
+                content = [Content(schema = Schema(implementation = ResponseData::class))]
+            )
+        ]
+    )
+    fun getOrderHistory(
+        @Parameter(description = "사용자 ID", required = true, example = "1")
+        userId: Long,
+        @Parameter(description = "검색 조건 (page, size, sort)")
+        searchRequest: OrderSearchRequest
+    ): ResponseEntity<ResponseData<PaginationResponse<OrderResponse>>>
 }
