@@ -212,6 +212,21 @@ Presentation → Application → Domain
 - 복잡한 비즈니스 로직에 설명 추가
 - TODO, FIXME 태그 활용
 
+### 서비스 계층 의존성 규칙
+
+#### 도메인 간 의존성 관리
+- **같은 도메인**: Repository를 직접 주입받아 사용
+  - e.g. `PointService`는 `PointRepository`, `PointHistoryRepository` 직접 주입 가능
+- **다른 도메인**: 반드시 Service를 통해 접근
+  - e.g. `PointService`에서 User 정보 필요 시 `UserService` 주입받아 사용
+  - 금지: 다른 도메인의 Repository 직접 주입 (`UserRepository` 등)
+
+#### 목적
+- 도메인 경계 명확화
+- 도메인 로직의 응집도 향상
+- 변경 영향 범위 최소화
+- 순환 의존성 방지
+
 ---
 
 ## 테스트
