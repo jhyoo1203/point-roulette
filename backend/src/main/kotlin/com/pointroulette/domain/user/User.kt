@@ -15,7 +15,10 @@ import jakarta.persistence.*
 )
 class User(
     @Column(nullable = false, unique = true)
-    var nickname: String
+    var nickname: String,
+
+    @Column(name = "current_point", nullable = false)
+    var currentPoint: Int = 0
 ) : BaseEntity() {
 
     @Id
