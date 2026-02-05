@@ -50,4 +50,66 @@ class PointHistoryService(
 
         return pointHistoryRepository.save(pointHistory)
     }
+
+    /**
+     * 포인트 사용 이력을 기록합니다.
+     *
+     * @param user 사용자 엔티티
+     * @param point 사용된 Point 엔티티
+     * @param amount 사용 금액 (음수로 기록)
+     * @param balanceAfter 사용 후 잔액
+     * @param orderId 주문 ID
+     * @return 생성된 PointHistory 엔티티
+     */
+    @Transactional
+    fun recordUseHistory(
+        user: User,
+        point: Point,
+        amount: Int,
+        balanceAfter: Int,
+        orderId: Long
+    ): PointHistory {
+        val pointHistory = PointHistory(
+            user = user,
+            point = point,
+            amount = amount,
+            transactionType = TransactionType.USE,
+            referenceType = ReferenceType.ORDER,
+            referenceId = orderId,
+            balanceAfter = balanceAfter
+        )
+
+        return pointHistoryRepository.save(pointHistory)
+    }
+
+    /**
+     * 포인트 환불 이력을 기록합니다.
+     *
+     * @param user 사용자 엔티티
+     * @param point 환불된 Point 엔티티
+     * @param amount 환불 금액 (양수로 기록)
+     * @param balanceAfter 환불 후 잔액
+     * @param orderId 주문 ID
+     * @return 생성된 PointHistory 엔티티
+     */
+    @Transactional
+    fun recordRefundHistory(
+        user: User,
+        point: Point,
+        amount: Int,
+        balanceAfter: Int,
+        orderId: Long
+    ): PointHistory {
+        val pointHistory = PointHistory(
+            user = user,
+            point = point,
+            amount = amount,
+            transactionType = TransactionType.REFUND,
+            referenceType = ReferenceType.ORDER,
+            referenceId = orderId,
+            balanceAfter = balanceAfter
+        )
+
+        return pointHistoryRepository.save(pointHistory)
+    }
 }
