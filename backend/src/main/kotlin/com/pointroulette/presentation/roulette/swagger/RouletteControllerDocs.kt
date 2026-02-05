@@ -33,13 +33,13 @@ interface RouletteControllerDocs {
                 content = [Content(schema = Schema(implementation = RouletteParticipateResponse::class))]
             ),
             ApiResponse(
-                responseCode = "400",
-                description = "중복 참여 (오늘 이미 참여함)",
+                responseCode = "404",
+                description = "사용자를 찾을 수 없음",
                 content = [Content(schema = Schema(implementation = ResponseData::class))]
             ),
             ApiResponse(
-                responseCode = "404",
-                description = "사용자를 찾을 수 없음",
+                responseCode = "409",
+                description = "중복 참여 (오늘 이미 참여함)",
                 content = [Content(schema = Schema(implementation = ResponseData::class))]
             ),
             ApiResponse(

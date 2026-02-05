@@ -3,9 +3,15 @@ package com.pointroulette.presentation.admin.product
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.pointroulette.application.product.dto.ProductCreateRequest
 import com.pointroulette.application.product.dto.ProductUpdateRequest
+import com.pointroulette.domain.order.Order
+import com.pointroulette.domain.order.OrderRepository
+import com.pointroulette.domain.order.OrderStatus
 import com.pointroulette.domain.product.Product
 import com.pointroulette.domain.product.ProductRepository
 import com.pointroulette.domain.product.ProductStatus
+import com.pointroulette.domain.user.User
+import com.pointroulette.domain.user.UserRepository
+import com.pointroulette.helper.DatabaseCleaner
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -42,9 +48,18 @@ class AdminProductControllerTest {
     @Autowired
     private lateinit var productRepository: ProductRepository
 
+    @Autowired
+    private lateinit var orderRepository: OrderRepository
+
+    @Autowired
+    private lateinit var userRepository: UserRepository
+
+    @Autowired
+    private lateinit var databaseCleaner: DatabaseCleaner
+
     @BeforeEach
     fun setUp() {
-        productRepository.deleteAll()
+        databaseCleaner.clear()
     }
 
     @Nested
@@ -639,6 +654,99 @@ class AdminProductControllerTest {
                     accept = MediaType.APPLICATION_JSON
                 }.andExpect {
                     status { isNotFound() }
+                }
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("POST /api/v1/admin/products/orders/{orderId}/cancel")
+    inner class CancelOrderApiTest {
+
+        @Nested
+        @DisplayName("성공 케이스")
+        inner class SuccessTest {
+
+            @Test
+            @DisplayName("유효한 주문을 취소하면 200 응답과 취소된 주문 정보를 반환한다")
+            fun `should return 200 with cancelled order when order is valid`() {
+                // Given
+                val user = userRepository.save(User(nickname = "testuser", currentPoint = 0))
+                val product = productRepository.save(
+                    Product(name = "포인트 10,000원", price = 10000, stock = 98, status = ProductStatus.ACTIVE)
+                )
+                val order = orderRepository.save(
+                    Order(
+                        user = user,
+                        product = product,
+                        quantity = 2,
+                        totalPrice = 20000,
+                        status = OrderStatus.COMPLETED
+                    )
+                )
+
+                // When & Then
+                mockMvc.post("/api/v1/admin/products/orders/${order.id}/cancel") {
+                    accept = MediaType.APPLICATION_JSON
+                }.andExpect {
+                    status { isOk() }
+                    jsonPath("$.httpStatus") { value(200) }
+                    jsonPath("$.data.id") { value(order.id) }
+                    jsonPath("$.data.status") { value("CANCELLED") }
+                    jsonPath("$.data.totalPrice") { value(20000) }
+                }
+
+                // 주문 상태가 CANCELLED로 변경되었는지 확인
+                val updatedOrder = orderRepository.findById(order.id).get()
+                assertThat(updatedOrder.status).isEqualTo(OrderStatus.CANCELLED)
+
+                // 재고가 복구되었는지 확인
+                val updatedProduct = productRepository.findById(product.id).get()
+                assertThat(updatedProduct.stock).isEqualTo(100)
+            }
+        }
+
+        @Nested
+        @DisplayName("실패 케이스")
+        inner class FailTest {
+
+            @Test
+            @DisplayName("존재하지 않는 주문 ID면 404 에러를 반환한다")
+            fun `should return 404 when order does not exist`() {
+                // Given
+                val nonExistentId = 999L
+
+                // When & Then
+                mockMvc.post("/api/v1/admin/products/orders/$nonExistentId/cancel") {
+                    accept = MediaType.APPLICATION_JSON
+                }.andExpect {
+                    status { isNotFound() }
+                }
+            }
+
+            @Test
+            @DisplayName("이미 취소된 주문이면 400 에러를 반환한다")
+            fun `should return 400 when order is already cancelled`() {
+                // Given
+                val user = userRepository.save(User(nickname = "testuser", currentPoint = 0))
+                val product = productRepository.save(
+                    Product(name = "포인트 10,000원", price = 10000, stock = 100, status = ProductStatus.ACTIVE)
+                )
+                val order = orderRepository.save(
+                    Order(
+                        user = user,
+                        product = product,
+                        quantity = 1,
+                        totalPrice = 10000,
+                        status = OrderStatus.CANCELLED
+                    )
+                )
+
+                // When & Then
+                mockMvc.post("/api/v1/admin/products/orders/${order.id}/cancel") {
+                    accept = MediaType.APPLICATION_JSON
+                }.andExpect {
+                    status { isBadRequest() }
                 }
             }
         }

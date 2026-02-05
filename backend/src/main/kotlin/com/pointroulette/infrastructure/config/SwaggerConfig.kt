@@ -64,8 +64,16 @@ class SwaggerConfig(
     @Bean
     fun rouletteApi(): GroupedOpenApi {
         return GroupedOpenApi.builder()
-            .group("admin-roulette-api")
+            .group("roulette-api")
             .pathsToMatch("/api/v1/roulette/**")
+            .build()
+    }
+
+    @Bean
+    fun productApi(): GroupedOpenApi {
+        return GroupedOpenApi.builder()
+            .group("product-api")
+            .pathsToMatch("/api/v1/products/**")
             .build()
     }
 }

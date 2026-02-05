@@ -1,5 +1,7 @@
 package com.pointroulette.presentation.admin.product
 
+import com.pointroulette.application.order.OrderService
+import com.pointroulette.application.order.dto.OrderResponse
 import com.pointroulette.application.product.ProductService
 import com.pointroulette.application.product.dto.ProductCreateRequest
 import com.pointroulette.application.product.dto.ProductResponse
@@ -25,7 +27,8 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/admin/products")
 class AdminProductController(
-    private val productService: ProductService
+    private val productService: ProductService,
+    private val orderService: OrderService
 ) : AdminProductControllerDocs {
 
     @PostMapping
@@ -69,5 +72,13 @@ class AdminProductController(
     ): ResponseEntity<ResponseData<Unit>> {
         productService.deleteProduct(id)
         return ResponseEntity.ok(ResponseData.of(HttpStatus.OK))
+    }
+
+    @PostMapping("/orders/{orderId}/cancel")
+    override fun cancelOrder(
+        @PathVariable orderId: Long
+    ): ResponseEntity<ResponseData<OrderResponse>> {
+        val response = orderService.cancelOrder(orderId)
+        return ResponseEntity.ok(ResponseData.of(HttpStatus.OK, response))
     }
 }

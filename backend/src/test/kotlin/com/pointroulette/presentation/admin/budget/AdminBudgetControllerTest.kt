@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.pointroulette.application.budget.dto.DailyBudgetCreateRequest
 import com.pointroulette.domain.budget.DailyBudget
 import com.pointroulette.domain.budget.DailyBudgetRepository
+import com.pointroulette.helper.DatabaseCleaner
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -39,9 +40,12 @@ class AdminBudgetControllerTest {
     @Autowired
     private lateinit var dailyBudgetRepository: DailyBudgetRepository
 
+    @Autowired
+    private lateinit var databaseCleaner: DatabaseCleaner
+
     @BeforeEach
     fun setUp() {
-        dailyBudgetRepository.deleteAll()
+        databaseCleaner.clear()
     }
 
     @Nested
