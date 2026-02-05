@@ -76,4 +76,12 @@ class SwaggerConfig(
             .pathsToMatch("/api/v1/products/**")
             .build()
     }
+
+    @Bean
+    fun adminRouletteApi(): GroupedOpenApi {
+        return GroupedOpenApi.builder()
+            .group("admin-roulette-api")
+            .pathsToMatch("/api/v1/admin/roulette/**")
+            .build()
+    }
 }
