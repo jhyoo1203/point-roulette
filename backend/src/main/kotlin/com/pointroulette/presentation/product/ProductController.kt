@@ -3,6 +3,7 @@ package com.pointroulette.presentation.product
 import com.pointroulette.application.order.OrderService
 import com.pointroulette.application.order.dto.OrderCreateRequest
 import com.pointroulette.application.order.dto.OrderResponse
+import com.pointroulette.application.order.dto.OrderSearchRequest
 import com.pointroulette.application.product.ProductService
 import com.pointroulette.application.product.dto.ProductResponse
 import com.pointroulette.application.product.dto.ProductSearchRequest
@@ -43,5 +44,14 @@ class ProductController(
         val response = orderService.createOrder(userId, request)
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ResponseData.of(HttpStatus.CREATED, response))
+    }
+
+    @GetMapping("/orders/{userId}")
+    override fun getOrderHistory(
+        @PathVariable userId: Long,
+        @ModelAttribute searchRequest: OrderSearchRequest
+    ): ResponseEntity<ResponseData<PaginationResponse<OrderResponse>>> {
+        val response = orderService.getOrderHistory(userId, searchRequest)
+        return ResponseEntity.ok(ResponseData.of(HttpStatus.OK, response))
     }
 }

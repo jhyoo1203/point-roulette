@@ -1,5 +1,7 @@
 package com.pointroulette.application.point
 
+import com.pointroulette.application.point.dto.PointBalanceResponse
+import com.pointroulette.application.point.dto.PointResponse
 import com.pointroulette.application.user.UserService
 import com.pointroulette.domain.point.InsufficientPointException
 import com.pointroulette.domain.point.Point
@@ -224,6 +226,31 @@ class PointService(
             balanceAfter = user.currentPoint,
             sourceType = sourceType,
             sourceId = sourceId
+        )
+    }
+
+    /**
+     * 사용자의 포인트 잔액 및 포인트 목록을 조회합니다.
+     * - 현재 포인트 잔액
+     * - 7일 이내 만료 예정 포인트
+     * - 보유한 포인트 목록 (만료일 오름차순)
+     *
+     * @param userId 사용자 ID
+     * @return 포인트 잔액 응답
+     */
+    @Transactional(readOnly = true)
+    fun getPointBalance(userId: Long): PointBalanceResponse {
+        val user = userService.getUser(userId)
+        val points = pointRepository.findAllByUserId(userId)
+        val expiringPoints = pointRepository.findExpiringPointsIn7Days(userId)
+
+        val expiringPointSum = expiringPoints.sumOf { it.remainingAmount }
+
+        return PointBalanceResponse(
+            userId = user.id,
+            currentPoint = user.currentPoint,
+            expiringPointIn7Days = expiringPointSum,
+            points = points.map { PointResponse.from(it) }
         )
     }
 }

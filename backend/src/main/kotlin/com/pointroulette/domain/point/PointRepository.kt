@@ -34,4 +34,31 @@ interface PointRepository : JpaRepository<Point, Long> {
         sourceType: PointSourceType,
         sourceId: Long
     ): Point?
+
+    /**
+     * 사용자의 모든 포인트 조회 (만료일 오름차순)
+     * - 포인트 잔액 조회용
+     */
+    @Query("""
+        SELECT p FROM Point p
+        JOIN FETCH p.user
+        WHERE p.user.id = :userId
+          AND p.remainingAmount > 0
+        ORDER BY p.expiresAt ASC, p.id ASC
+    """)
+    fun findAllByUserId(userId: Long): List<Point>
+
+    /**
+     * 사용자의 7일 이내 만료 예정 포인트 조회
+     */
+    @Query("""
+        SELECT p FROM Point p
+        JOIN FETCH p.user
+        WHERE p.user.id = :userId
+          AND p.status = 'ACTIVE'
+          AND p.remainingAmount > 0
+          AND p.expiresAt BETWEEN CURRENT_TIMESTAMP AND CURRENT_TIMESTAMP + 7 DAY
+        ORDER BY p.expiresAt ASC
+    """)
+    fun findExpiringPointsIn7Days(userId: Long): List<Point>
 }
