@@ -12,4 +12,7 @@ enum class ErrorCode(val httpStatus: HttpStatus, val message: String) {
     // 룰렛
     ALREADY_ROULETTE_PARTICIPATED(HttpStatus.CONFLICT, "오늘 이미 룰렛에 참여했습니다."),
     ROULETTE_PARTICIPATION_FAILED(HttpStatus.BAD_REQUEST, "룰렛 참여에 실패했습니다."),
+
+    // 포인트
+    INSUFFICIENT_POINT(HttpStatus.UNPROCESSABLE_ENTITY, "포인트가 부족합니다."),
 }
