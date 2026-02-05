@@ -30,9 +30,6 @@ class Point(
     @Column(name = "remaining_amount", nullable = false)
     var remainingAmount: Int = initialAmount,
 
-    @Column(name = "earned_at", nullable = false)
-    val earnedAt: LocalDateTime,
-
     @Column(name = "expires_at", nullable = false)
     val expiresAt: LocalDateTime,
 
