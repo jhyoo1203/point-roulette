@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { Toaster } from '@/shared/components/ui/sonner';
 import AdminLayout from '@/shared/components/layout/AdminLayout';
 import DashboardPage from '@/pages/dashboard/DashboardPage';
 import BudgetPage from '@/pages/budget/BudgetPage';
@@ -17,6 +18,7 @@ export default function App() {
           <Route path="/orders" element={<OrderPage />} />
         </Route>
       </Routes>
+      <Toaster />
     </BrowserRouter>
   );
 }
