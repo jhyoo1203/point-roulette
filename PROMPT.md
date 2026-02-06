@@ -315,6 +315,42 @@ Phase 0 (공통 인프라)
 
 ---
 
+### [생산성 향상] Admin Web 공통 인프라 설정 (Phase 0)
+
+**프롬프트**
+```
+GitHub Issue #35의 요구사항에 따라 admin-web의 공통 인프라를 설정.
+현재 admin-web은 Vite + React 초기 템플릿 상태이며, 핵심 라이브러리 미설치 상태.
+Apidog에서 확인한 API 응답 구조를 기반으로 타입 정의.
+
+[답변] 
+구현 계획을 plan mode로 설계 후 실행:
+1단계: 의존성 설치 및 기본 설정 (Tailwind CSS, shadcn/ui, path alias)
+2단계: 공통 타입 정의 (Apidog 스펙 기반)
+3단계: API Client 설정 (Axios 인스턴스 + 인터셉터)
+4단계: TanStack Query Provider 설정
+5단계: Query Keys 중앙 관리
+6단계: React Router 라우팅
+7단계: 공통 Layout 구현 (Sidebar + Header)
+```
+
+**설명**
+- Phase 0 공통 인프라 전체 구현 (개발 순서 수립에서 정의한 범위)
+- Apidog MCP에서 ResponseData, PaginationResponse 스키마를 확인하여 타입 정의
+- Plan mode로 구현 계획을 사전 설계 후 승인 후 실행
+- 생성/수정 파일 19개, `pnpm build` 타입 에러 없이 성공 확인
+
+**주요 구현 내용**
+1. **의존성**: axios, @tanstack/react-query, react-router-dom, tailwindcss, @tailwindcss/vite, shadcn/ui
+2. **설정**: path alias (`@/*`), Tailwind CSS v4, shadcn/ui (`src/shared/components/ui/`)
+3. **공통 타입**: `ApiResponse<T>`, `ApiErrorResponse`, `PaginatedData<T>`, `PaginationParams`, `ErrorCode`
+4. **API Client**: Axios 인스턴스 + 응답/에러 인터셉터 + 타입 안전 헬퍼 함수 (`apiGet`, `apiPost`, `apiPut`, `apiDelete`)
+5. **TanStack Query**: QueryClient (staleTime: 5s, refetchOnWindowFocus), 중앙 관리 queryKeys
+6. **라우팅**: BrowserRouter + AdminLayout 내 4개 라우트 (dashboard, budget, products, orders)
+7. **레이아웃**: Sidebar (NavLink active 상태, 모바일 반응형) + Header (모바일 토글) + Outlet
+
+---
+
 ## 2. NotebookLM
 
 ### [설계] 웹 어드민 테크스펙 생성
