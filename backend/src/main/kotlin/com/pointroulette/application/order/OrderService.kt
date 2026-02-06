@@ -132,4 +132,23 @@ class OrderService(
         val page = orderRepository.findAllByUserId(user.id, pageable)
         return PaginationResponse.from(page, OrderResponse::from)
     }
+
+    /**
+     * 관리자용 전체 주문 목록을 조회합니다. (필터링 지원)
+     * - userId, status로 필터링 가능
+     * - 최신순으로 정렬
+     *
+     * @param searchRequest 검색 조건 (페이징, 정렬, 필터)
+     * @return 주문 목록 페이징 응답
+     */
+    @Transactional(readOnly = true)
+    fun getAllOrders(searchRequest: OrderSearchRequest): PaginationResponse<OrderResponse> {
+        val pageable = searchRequest.toPageable()
+        val page = orderRepository.findAllWithFilters(
+            userId = searchRequest.userId,
+            status = searchRequest.status,
+            pageable = pageable
+        )
+        return PaginationResponse.from(page, OrderResponse::from)
+    }
 }
