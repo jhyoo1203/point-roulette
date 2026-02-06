@@ -22,10 +22,10 @@ spring:
 
 swagger:
   server:
+    production:
+      url: ${SWAGGER_PRODUCTION_URL}
     local:
       url: http://localhost:8080
-#    production:
-#      url: ${SWAGGER_PRODUCTION_URL}
 
 springdoc:
   swagger-ui:

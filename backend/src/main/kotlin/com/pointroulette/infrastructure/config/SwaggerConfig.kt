@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class SwaggerConfig(
     @param:Value("\${swagger.server.local.url}") private val localUrl: String,
-//    @Value("\${swagger.server.production.url}") private val productionUrl: String
+    @param:Value("\${swagger.server.production.url}") private val productionUrl: String
 ) {
 
     @Bean
@@ -24,17 +24,17 @@ class SwaggerConfig(
             .version("1.0.0")
             .description("포인트 룰렛 시스템 API 문서")
 
+        val productionServer = Server()
+            .url(productionUrl)
+            .description("Production server(실제로는 production에 swagger를 노출하지 않지만 과제 제출을 위해 설정)")
+
         val localServer = Server()
             .url(localUrl)
             .description("Local server")
 
-//        val productionServer = Server()
-//            .url(productionUrl)
-//            .description("Production server(실제로는 production에 swagger를 노출하지 않지만 과제 제출을 위해 설정)")
-
         return OpenAPI()
             .info(info)
-            .servers(listOf(localServer))
+            .servers(listOf(productionServer, localServer))
     }
 
     @Bean

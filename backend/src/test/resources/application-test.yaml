@@ -18,3 +18,8 @@ logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+swagger:
+  server:
+    production:
+      url: test
