@@ -7,9 +7,10 @@ import { useRouletteParticipations } from '@/features/roulette/hooks/useRoulette
 import { BudgetTable } from '@/features/budget/components/BudgetTable';
 import { BudgetCreateDialog } from '@/features/budget/components/BudgetCreateDialog';
 import { ParticipationTable } from '@/features/roulette/components/ParticipationTable';
+import { getTodayInKST } from '@/shared/lib/dateUtils';
 
 export default function BudgetPage() {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getTodayInKST();
 
   // 예산 조회 상태
   const [budgetStartDate, setBudgetStartDate] = useState(today);

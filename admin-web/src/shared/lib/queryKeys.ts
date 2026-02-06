@@ -21,4 +21,10 @@ export const queryKeys = {
     all: ['roulette'] as const,
     participations: (params?: RouletteParticipationListParams) => ['roulette', 'participations', params] as const,
   },
+  dashboard: {
+    all: ['dashboard'] as const,
+    today: (date: string) => ['dashboard', 'today', date] as const,
+    todayBudget: (date: string) => ['dashboard', 'budget', date] as const,
+    todayRouletteStats: (date: string) => ['dashboard', 'roulette', date] as const,
+  },
 } as const;
