@@ -23,3 +23,6 @@ swagger:
   server:
     production:
       url: test
+
+cors:
+  allowed-origins: http://localhost:5173

@@ -20,3 +20,6 @@ spring:
         order_inserts: true
         order_updates: true
     open-in-view: false
+
+cors:
+  allowed-origins: http://localhost:5173
