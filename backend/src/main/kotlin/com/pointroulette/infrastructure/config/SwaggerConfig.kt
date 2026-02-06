@@ -92,4 +92,12 @@ class SwaggerConfig(
             .pathsToMatch("/api/v1/points/**")
             .build()
     }
+
+    @Bean
+    fun adminOrderApi(): GroupedOpenApi {
+        return GroupedOpenApi.builder()
+            .group("admin-order-api")
+            .pathsToMatch("/api/v1/admin/orders/**")
+            .build()
+    }
 }

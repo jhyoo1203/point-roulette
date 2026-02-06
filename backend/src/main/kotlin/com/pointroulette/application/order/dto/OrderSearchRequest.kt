@@ -1,6 +1,7 @@
 package com.pointroulette.application.order.dto
 
 import com.pointroulette.common.model.PaginationRequest
+import com.pointroulette.domain.order.OrderStatus
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
@@ -25,7 +26,13 @@ data class OrderSearchRequest(
         example = "createdAt,desc",
         defaultValue = "createdAt,desc"
     )
-    val sort: String = "createdAt,desc"
+    val sort: String = "createdAt,desc",
+
+    @field:Schema(description = "사용자 ID (관리자 전용 필터)", example = "1", required = false)
+    val userId: Long? = null,
+
+    @field:Schema(description = "주문 상태 (관리자 전용 필터)", example = "COMPLETED", required = false)
+    val status: OrderStatus? = null
 ) {
     /**
      * Spring Data Pageable 객체로 변환
