@@ -346,6 +346,7 @@ class OrderServiceTest {
             val orders = listOf(order2, order1) // 최신순 (id 2가 먼저)
             val page = PageImpl(orders, pageable, 2)
 
+            given(userService.getUser(userId)).willReturn(user)
             given(orderRepository.findAllByUserId(userId, pageable)).willReturn(page)
 
             // When
@@ -371,6 +372,13 @@ class OrderServiceTest {
             val pageable = searchRequest.toPageable()
             val emptyPage = PageImpl<Order>(emptyList(), pageable, 0)
 
+            val user = TestEntityFactory.createUser(
+                id = userId,
+                nickname = "testuser",
+                currentPoint = 10000
+            )
+
+            given(userService.getUser(userId)).willReturn(user)
             given(orderRepository.findAllByUserId(userId, pageable)).willReturn(emptyPage)
 
             // When
@@ -422,6 +430,7 @@ class OrderServiceTest {
             val orders = listOf(cancelledOrder, completedOrder)
             val page = PageImpl(orders, pageable, 2)
 
+            given(userService.getUser(userId)).willReturn(user)
             given(orderRepository.findAllByUserId(userId, pageable)).willReturn(page)
 
             // When

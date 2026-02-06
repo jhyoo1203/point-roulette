@@ -128,7 +128,8 @@ class OrderService(
     @Transactional(readOnly = true)
     fun getOrderHistory(userId: Long, searchRequest: OrderSearchRequest): PaginationResponse<OrderResponse> {
         val pageable = searchRequest.toPageable()
-        val page = orderRepository.findAllByUserId(userId, pageable)
+        val user = userService.getUser(userId)
+        val page = orderRepository.findAllByUserId(user.id, pageable)
         return PaginationResponse.from(page, OrderResponse::from)
     }
 }
