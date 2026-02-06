@@ -351,6 +351,23 @@ Apidog에서 확인한 API 응답 구조를 기반으로 타입 정의.
 
 ---
 
+### [생산성 향상] Admin Web 예산 관리 및 룰렛 참여 취소 기능 구현
+
+**프롬프트**
+```
+#41 이슈 진행. apidog에서 관련 api 확인 및 진행. /vercel-react-best-practices
+```
+
+**설명**
+- GitHub Issue #41: Admin 예산 관리 및 룰렛 참여 취소 기능 구현
+- Apidog MCP를 활용하여 관련 API 스펙 확인 및 구현
+- `/react-best-practices` 스킬을 활용한 React 성능 최적화 패턴 적용
+- 프론트엔드 전체 기능 구현 (예산 조회/생성, 룰렛 참여 조회/취소, Double-Lock 패턴)
+
+> **이후 단순 API 연동이나 프론트엔드 생산 로직은 계속 유사한 대화 맥락이기 때문에 PROMPT.md 기록 생략**
+
+---
+
 ## 2. NotebookLM
 
 ### [설계] 웹 어드민 테크스펙 생성

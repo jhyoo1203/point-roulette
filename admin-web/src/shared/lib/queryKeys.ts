@@ -15,4 +15,8 @@ export const queryKeys = {
     all: ['orders'] as const,
     list: (params?: PaginationParams) => ['orders', 'list', params] as const,
   },
+  roulette: {
+    all: ['roulette'] as const,
+    participations: (params?: Record<string, unknown>) => ['roulette', 'participations', params] as const,
+  },
 } as const;

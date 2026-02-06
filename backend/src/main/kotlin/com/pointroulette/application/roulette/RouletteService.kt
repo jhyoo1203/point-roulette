@@ -4,8 +4,11 @@ import com.pointroulette.application.budget.DailyBudgetService
 import com.pointroulette.application.point.PointService
 import com.pointroulette.application.roulette.dto.RouletteHistoryResponse
 import com.pointroulette.application.roulette.dto.RouletteParticipateResponse
+import com.pointroulette.application.roulette.dto.RouletteParticipationResponse
+import com.pointroulette.application.roulette.dto.RouletteParticipationSearchRequest
 import com.pointroulette.application.roulette.dto.RouletteStatusResponse
 import com.pointroulette.application.user.UserService
+import com.pointroulette.common.model.PaginationResponse
 import com.pointroulette.domain.point.PointSourceType
 import com.pointroulette.domain.roulette.AlreadyParticipatedException
 import com.pointroulette.domain.roulette.RouletteHistory
@@ -100,6 +103,24 @@ class RouletteService(
             todayRemainingBudget = remainingBudget,
             lastParticipation = todayHistory?.let { RouletteHistoryResponse.from(it) }
         )
+    }
+
+    /**
+     * 날짜 범위로 룰렛 참여 이력을 조회합니다. (관리자 전용)
+     *
+     * @param request 검색 요청 (날짜 범위, 페이징 정보)
+     * @return 룰렛 참여 이력 페이징 응답
+     */
+    @Transactional(readOnly = true)
+    fun getParticipations(request: RouletteParticipationSearchRequest): PaginationResponse<RouletteParticipationResponse> {
+        val pageable = request.toPageable()
+        val page = rouletteHistoryRepository.findAllByParticipatedDateBetweenWithUser(
+            request.startDate,
+            request.endDate,
+            pageable
+        )
+
+        return PaginationResponse.from(page, RouletteParticipationResponse::from)
     }
 
     /**
