@@ -8,6 +8,17 @@
         "obsidian-mcp",
         "${OBSIDIAN_VAULT_PATH}"
       ]
+    },
+    "apidog": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "apidog-mcp-server@latest",
+        "--project-id=${POINT_ROULETTE_APIDOG_PID}"
+      ],
+      "env": {
+        "APIDOG_ACCESS_TOKEN": "${APIDOG_ACCESS_TOKEN}"
+      }
     }
   }
 }
