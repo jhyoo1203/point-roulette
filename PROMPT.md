@@ -280,6 +280,41 @@ admin-web 모듈의 README.md 문서를 보강해줘.
 
 ---
 
+### [설계] Admin Web 개발 순서 수립
+
+**프롬프트**
+```
+@admin-web/README.md이랑, obsidian에서 '2026 상반기 유저서비스스쿼드 과제', '웹 어드민 테크스펙' 문서 확인해서
+어드민 웹 개발 순서를 어떻게 가져가면 좋을지 제안해줘.
+
+[답변 이후]
+이 내용 obsidian vault에 기록해줘.
+```
+
+**결과: 개발 순서 제안**
+```
+Phase 0 (공통 인프라)
+  → Phase 1 (상품 CRUD — 패턴 확립)
+    → Phase 2 (예산/룰렛 — 핵심 비즈니스)
+      → Phase 3 (주문 — 패턴 재활용)
+        → Phase 4 (대시보드 — 집계)
+          → Phase 5 (폴리싱)
+```
+
+- **Phase 0: 공통 인프라** — API Client, TanStack Query Provider, Query Keys, Layout, Router, 공통 타입
+- **Phase 1: 상품 관리** — 가장 전형적인 CRUD로 테이블/폼/모달/useMutation 패턴 확립
+- **Phase 2: 예산/룰렛 관리** — 핵심 비즈니스 로직, Double-Lock 패턴 구현
+- **Phase 3: 주문 내역** — Phase 1~2 패턴 재활용으로 빠르게 구현
+- **Phase 4: 대시보드** — 다른 도메인 데이터 집계, 백엔드 API 준비 후 마지막에 구현
+- **Phase 5: 마무리** — Error Boundary, Toast, Loading State, 엣지 케이스
+
+**설명**
+- admin-web/README.md, 과제 문서, 웹 어드민 테크스펙 3개 문서를 종합 분석
+- Phase 1에서 패턴을 확립하면 이후 Phase는 복사-변형 수준으로 가속 가능
+- 대시보드를 마지막에 배치하여 리스크 최소화 (시간 부족 시 간소화 가능)
+
+---
+
 ## 2. NotebookLM
 
 ### [설계] 웹 어드민 테크스펙 생성
