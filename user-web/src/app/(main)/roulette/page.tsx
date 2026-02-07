@@ -1,6 +1,6 @@
-export const metadata = {
-  title: '룰렛 - Point Roulette',
-};
+'use client';
+
+import { RouletteWheel } from '@/features/roulette/components/RouletteWheel';
 
 export default function RoulettePage() {
   return (
@@ -11,27 +11,7 @@ export default function RoulettePage() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-        <div className="flex flex-col items-center justify-center space-y-6">
-          <div className="w-48 h-48 bg-gray-100 rounded-full flex items-center justify-center shadow-inner border-4 border-gray-200">
-            <div className="text-center">
-              <div className="text-6xl mb-2">🎰</div>
-              <p className="text-sm text-gray-500 font-medium">룰렛 UI</p>
-            </div>
-          </div>
-
-          <div className="w-full space-y-3">
-            <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">오늘 잔여 예산</span>
-                <span className="text-lg font-bold text-indigo-600">100,000p</span>
-              </div>
-            </div>
-
-            <button className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-indigo-700 hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all">
-              룰렛 돌리기
-            </button>
-          </div>
-        </div>
+        <RouletteWheel />
       </div>
 
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">

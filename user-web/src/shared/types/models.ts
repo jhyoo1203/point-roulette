@@ -28,9 +28,9 @@ export interface RouletteStatusResponse {
 
 export interface RouletteHistoryResponse {
   id: number;
-  userId: number;
+  participatedDate: string;
   wonAmount: number;
-  participatedAt: string;
+  status: string;
 }
 
 // ===== Point =====
