@@ -98,19 +98,27 @@ export function RouletteWheel() {
       </div>
 
       {/* 예산 정보 */}
-      <div className="w-full bg-gray-50 rounded-xl p-4 border border-gray-200">
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600">오늘 잔여 예산</span>
-          <span className="text-lg font-bold text-indigo-600">
-            {status?.todayRemainingBudget.toLocaleString()}p
-          </span>
+      {(status?.todayRemainingBudget ?? 0) >= 1000 ? (
+        <div className="w-full bg-gray-50 rounded-xl p-4 border border-gray-200">
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">오늘 잔여 예산</span>
+            <span className="text-lg font-bold text-indigo-600">
+              {status?.todayRemainingBudget.toLocaleString()}p
+            </span>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="w-full bg-red-50 rounded-xl p-4 border border-red-200">
+          <div className="flex justify-center items-center">
+            <span className="text-sm text-red-600 font-semibold">오늘 예산이 소진되었습니다</span>
+          </div>
+        </div>
+      )}
 
       {/* 스핀 버튼 */}
       <button
         onClick={handleSpin}
-        disabled={isSpinning || isPending || status?.hasParticipatedToday || (status?.todayRemainingBudget ?? 0) <= 0}
+        disabled={isSpinning || isPending || status?.hasParticipatedToday || (status?.todayRemainingBudget ?? 0) < 1000}
         className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-indigo-700 hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all disabled:bg-gray-400 disabled:cursor-not-allowed disabled:transform-none"
       >
         {isSpinning || isPending
