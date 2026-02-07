@@ -5,6 +5,7 @@ import com.pointroulette.application.point.dto.PointResponse
 import com.pointroulette.application.user.UserService
 import com.pointroulette.domain.point.InsufficientPointException
 import com.pointroulette.domain.point.Point
+import com.pointroulette.domain.point.PointAlreadyUsedException
 import com.pointroulette.domain.point.PointRepository
 import com.pointroulette.domain.point.PointSourceType
 import com.pointroulette.domain.point.PointStatus
@@ -203,6 +204,11 @@ class PointService(
         // 해당 sourceId로 획득한 포인트 찾기
         val pointToReclaim = pointRepository.findByUserIdAndSourceTypeAndSourceId(userId, sourceType, sourceId)
             ?: throw IllegalStateException("회수할 포인트를 찾을 수 없습니다. (sourceId: $sourceId)")
+
+        // 이미 사용된 포인트인지 확인
+        if (pointToReclaim.initialAmount != pointToReclaim.remainingAmount) {
+            throw PointAlreadyUsedException(pointToReclaim.initialAmount, pointToReclaim.remainingAmount)
+        }
 
         // 포인트가 일부 또는 전체 사용된 경우 고려
         val reclaimAmount = minOf(amount, user.currentPoint)

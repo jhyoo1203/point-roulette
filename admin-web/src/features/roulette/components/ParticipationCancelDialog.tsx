@@ -46,6 +46,9 @@ export function ParticipationCancelDialog({
             <li>사용자 포인트가 회수됩니다 (-{participation.wonAmount.toLocaleString()}p)</li>
             <li>참여 상태가 CANCELLED로 변경됩니다</li>
           </ul>
+          <p className="mt-3 text-sm text-amber-600">
+            ⚠️ 사용자가 포인트를 이미 사용한 경우 회수가 불가능합니다.
+          </p>
         </div>
       }
     />
