@@ -17,6 +17,12 @@ export function useCancelParticipation() {
       toast.success('룰렛 참여가 취소되고 포인트가 회수되었습니다.');
     },
     onError: (error: ApiErrorResponse) => {
+      // 포인트가 이미 사용된 경우
+      if (error.errorCode === 'POINT_ALREADY_USED') {
+        toast.error('사용자가 해당 포인트를 이미 사용하여 회수할 수 없습니다.');
+        return;
+      }
+
       const message = error.errors
         ? Object.values(error.errors).join(', ')
         : '참여 취소에 실패했습니다.';

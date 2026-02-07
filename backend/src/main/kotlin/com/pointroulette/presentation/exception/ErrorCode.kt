@@ -15,4 +15,5 @@ enum class ErrorCode(val httpStatus: HttpStatus, val message: String) {
 
     // 포인트
     INSUFFICIENT_POINT(HttpStatus.UNPROCESSABLE_ENTITY, "포인트가 부족합니다."),
+    POINT_ALREADY_USED(HttpStatus.CONFLICT, "이미 사용된 포인트는 회수할 수 없습니다."),
 }
